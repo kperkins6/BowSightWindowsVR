@@ -1,0 +1,33 @@
+Bow Sight Windows 0.3.0 - current MGO meshes
+
+Install this ZIP through Mod Organizer 2. The FOMOD installer offers:
+  Left-handed: bow in RIGHT hand, string drawn with LEFT hand.
+  Right-handed: bow in LEFT hand, string drawn with RIGHT hand.
+Choose exactly one. Reinstall and replace the mod to change handedness.
+Disable the older [NoDelete] Long Bow Left-Hand Sight Window entry.
+Place this package after the installed bow-mesh providers so its meshes win.
+
+Includes standard playable Skyrim/Dawnguard/Dragonborn bow designs, Bound Bow,
+Drainspell Bow and existing unique-model variants used by this setup. There
+are 34 mesh paths per handedness, including first-person and display variants.
+Every mesh, including Long Bow, is regenerated from the untouched source.
+Compared with 0.2.0, the remaining section is approximately 40% wider and the
+opening is 15% shorter. The arrow shelf stays at its existing height.
+No crossbows or NPC-only dummy weapons are included.
+
+Only visual meshes are installed. Existing skeletons, grip/arrow placement,
+collision, animation references, shaders/materials and Bow Inertia settings
+are retained. Glass and other ornate bows have the notch-side portion narrowed
+while the far side is retained. Bound Bow flame/refraction meshes also have
+an opening. New edge vertices on these effect sheets use the hardware limit
+of four bone influences; original vertices retain their original weights.
+
+These files are derived from your currently installed MGO/Cathedral/PGPatcher
+and unique-bow providers, not a texture-independent vanilla distribution.
+Keep the current texture/material/unique-bow dependencies. Mesh replacements
+from later mods or a rerun of PGPatcher can overwrite the cutouts.
+
+Geometry, weights, bounds, preservation and both FOMOD choices were checked
+offline. The user approved the 0.2.0 appearance; these revised proportions
+await headset evaluation. Disable this separate mod to restore your previous
+models. Previous 0.1.0 and 0.2.0 archives are preserved for rollback.

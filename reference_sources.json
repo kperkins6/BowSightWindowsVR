@@ -1,0 +1,311 @@
+{
+  "version": "0.3.0",
+  "meshes": [
+    {
+      "path": "_pgpatcher_dups/1/weapons/elven/elvenbowskinned.nif",
+      "sha256": "357a5a99374bf4bcad983b485db04b016bf17c9fe6cac6cf51e36e1b9f978200",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "9d742e1417bf5e5958fce5d8f263f41930f1ee375eee784885a5eaa2709fc81a",
+        "right": "717a572b16e0f84c01fcef6ca5769573ea2c833018519efbbd5c3f2804fd1380"
+      }
+    },
+    {
+      "path": "_pgpatcher_dups/1/weapons/glass/glassbowskinned.nif",
+      "sha256": "6efb8e8f0bfafa2f79760e7be5c8548dad9106ae0fdf34e7c3eab28411cbcfa8",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "4eb2f615d51f5c126180c3f8ec0e142dad68adb6b62a7f7436f6971c063dc4b5",
+        "right": "55bf0bec0acef9745e36129e732449b74b535db5af75a2e66019874d6f11dc37"
+      }
+    },
+    {
+      "path": "_pgpatcher_dups/1/weapons/nordhero/nordherobow.nif",
+      "sha256": "27aa05f7627f0b0ca51f510e223d54c6ac9638a5d418021bf1fb166288bbb87b",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "40a59973151c8519aa8043c79628c1e761bbcbe1f7eba3aed42b9d8fe5bf898c",
+        "right": "dd903a058017d11058d05f89be2684d87cdcaf87193e08171ec3a8b1e209dc67"
+      }
+    },
+    {
+      "path": "dlc01/weapons/auriel/aurielsbow.nif",
+      "sha256": "279011a5b84542d419c625bd87144a190b1844a2b61516410b3141864ea03080",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "7c2bbd64568a98c12355d3d2a98403682e953cf7b7707fe38e96ffbdcfb8e88c",
+        "right": "74b4c710d685b205530b1dd546f0bd38702043d5cd760480bd8c53646cf3fa97"
+      }
+    },
+    {
+      "path": "dlc01/weapons/dragonbone/bow.nif",
+      "sha256": "5bb2d6e6e1cd72ec24442c80ae2cd1341efa2f1f61ff2dbbf4122c5204bb19e3",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "d0b12d66a8f8bc715d90c117f85c7e03a1ef48450ba00b91d36376e00fa57c3c",
+        "right": "ba9872662996f2113039bd4b9815c1c49bf0e9ca84de4411b4443af0f5912b13"
+      }
+    },
+    {
+      "path": "dlc02/weapons/dwarven/dwarvenbowkarztev01.nif",
+      "sha256": "5c4a2e58004a07a3255bce759653b0832c39abfb84f0e264dfba61e3a64d3643",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "8eb277769d98cde38e7473211ce955988f376b47270a36af9272fd3d2db7cfe5",
+        "right": "a47e32bf1b1c1547d99ba51cfca97b10045e9e7815d5afd920943d64a033c09f"
+      }
+    },
+    {
+      "path": "dlc02/weapons/dwarven/dwarvenbowkarztev01disp.nif",
+      "sha256": "a5b5ecb309fd23b64305a733c0694d01423abb34595c7035f4a076c1e144082f",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "d2247e9bf683b9504295485c1feadab35ca8dbc20662b8502ecf9ae02ed987f3",
+        "right": "d8247d70881e72e7595fb4cfd2c45cfd17cc5feb8ff365d42da53c7bfb3a33b6"
+      }
+    },
+    {
+      "path": "dlc02/weapons/nordic/nordicbow.nif",
+      "sha256": "c078dabe0d5d55d86ae6dff467316895d8fa0566ebfdca1e082d472c206a80c7",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "c848ced9669fdbf6a8e9b445da959876b51bd8b59ba6b47558372e619ccbffc7",
+        "right": "8ea34f05321fbca65b25014128cdb962ca1a7e6b542330f7d8e042f58b62a078"
+      }
+    },
+    {
+      "path": "dlc02/weapons/stahlrim/stahlrimbow.nif",
+      "sha256": "869a01cafb823a394eddcec8f1df87b1ae467242171f9eb54cddbcdf49579769",
+      "provider": "Cathedral - Armory",
+      "referenceOutputs": {
+        "left": "64a86841f8aff0a1c48f98df93430cddcf76bbb0962a7b688c3b22252badd4ec",
+        "right": "cca1d6ac6706b6cde97bbfa4a5c72ce99f832d2a2bb5afa09ba24da7f46fb626"
+      }
+    },
+    {
+      "path": "weapons/boundweapons/boundbow.nif",
+      "sha256": "3e59d4d191b42d41e69b6798605fa1deb8cc914530a9095fc08ad01863522a0b",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "4950bbeeea1b32629762dee69b922a00bd0aaa97a97e609a26976090bf172f8c",
+        "right": "e90a8f96f1d36a098513738838dac807712de24fc32819eaec3f41225605edbd"
+      }
+    },
+    {
+      "path": "weapons/daedric/daedricbowskinned.nif",
+      "sha256": "2f3cbfab206b324c28aedf4fa6d53dfc5a66cfb1c4ccb547bd066245b1d4405e",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "45ffcfee6f613aad985622b51e05bf8ff64a7ad437b1572b94c0605827363da4",
+        "right": "712640a1362b1c0baf67b2eca96967f55fd972bb28acb5cec16cc17e6797fe19"
+      }
+    },
+    {
+      "path": "weapons/draugr/draugrbowskinned.nif",
+      "sha256": "9f0ef7c4e66f721949435cf7eae00f5a99eef49768a9404e43a0a6e2c83df0be",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "4096022e8fdf858cb86e487f4f9fd60d8c4205d8283ad90e4422d50f6324679b",
+        "right": "00a4f8ccb85710042091f7067f73736fbce43607f69c35668acc800b77895271"
+      }
+    },
+    {
+      "path": "weapons/draugr/draugrbowskinneddisp.nif",
+      "sha256": "35d979846bed5c3619ddfee4ae57cd116f2912b0439d36eaba7f0c5df2faddbb",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "81c81e04436f9ebef6b7d8c938212476d71cbd1ceafaecc5847cc1e4fadd74c3",
+        "right": "64208055b0cc3d5232e036f9612a06216304f87c94559805abce6340cb4648c9"
+      }
+    },
+    {
+      "path": "weapons/draugr/draugrmagicbowskinned.nif",
+      "sha256": "39507414a976f13f6f316413142eb29dd50aae05c78c4cde01385c9e9a408148",
+      "provider": "Skyrim - Meshes1.bsa",
+      "referenceOutputs": {
+        "left": "5dae39e2b69e33d7f2cd3858026a6ee719bab433682e169985156d122c0fc48a",
+        "right": "4d2a579dfb2d7f5a36d466fcad3d6bd4286e3c41d40a3e96057c8c3a59bc255a"
+      }
+    },
+    {
+      "path": "weapons/dwarven/dwarvenbowskinned.nif",
+      "sha256": "27bcb685138ef3408ddf818220590675457f19edd623b591ab0779331773d273",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "8fc18405e032ba2116fd0c041cafc0345bd43312c90f4d878ba2262ddd19d47e",
+        "right": "28f03cda3803da26bbf797a1f55b8b1c2b72d159748a6177ee8673614b7e10c1"
+      }
+    },
+    {
+      "path": "weapons/dwarven/dwarvenbowskinneddisp.nif",
+      "sha256": "fc0f4968d9218e189d84b0660510d397a413a4f481f47b02271c9a7efd047e68",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "79c5f4ccb94065daa09e9fd8d041e3379ba41f16a1d84c7ed90dfb3fd9246c8b",
+        "right": "3db61829b6b36f69efcf340421ca05cf69315214e74c74b0a5d779b083efffa6"
+      }
+    },
+    {
+      "path": "weapons/ebony/ebonybowskinned.nif",
+      "sha256": "a838a131af3b33990d316891821ba3c73facb36bca036266c75862307775fcf8",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "9d1d4ae9e1d1afa73a9b2869ae62466718f7cd97d4e2a9447f977c0d3f99cb7a",
+        "right": "4e98cc8c5719cca8105051b464423f474cd69af01e06f9d92ba4eea9fc4422cb"
+      }
+    },
+    {
+      "path": "weapons/elven/elvenbowskinned.nif",
+      "sha256": "f88954f0eefec453278e7113c2266192a6c90244436b3d94e1b3b057143d2eb7",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "6fb3919c31a3a659c589b4561aab56ef1db43a276564933e8d407fb0fad5434f",
+        "right": "b433780945d4b7b7e55e3a75453ff3dc0eacc15bb6b9cb5aa6968d13d1a5f5f3"
+      }
+    },
+    {
+      "path": "weapons/falmer/falmerbow.nif",
+      "sha256": "97f00631ea4271458e4a75ce848d8cfb677bc500aec17cab888c6610528f59d9",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "c09b89791eca62a4ca0c13490e61752f374bcadad3d3e8660ece9855bc2bf462",
+        "right": "2a5c0e3d4bd87954fe7a38b5477edffc869e347a2d50a9fb67c03b38817546e3"
+      }
+    },
+    {
+      "path": "weapons/forsworn/forswornbow.nif",
+      "sha256": "f6400f2e56c7d883463b3c9b1a96326810dca3b81a45d1e65f7051202c3a2efa",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "12e9f85beecb3ddb305e481664526b7eb4e135dbae4ca73bc802f1e82d79a3df",
+        "right": "368e55dc9bd627b85965d40bc519491b31a8d3236e8c86392b4e4de864523031"
+      }
+    },
+    {
+      "path": "weapons/glass/glassbowskinned.nif",
+      "sha256": "41faef53a95a9e62d77b16b76108fa28f90bd169dcbb89cd29b70d01f6d5aa67",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "b10a358bf766d10c43832c245f2331e582a41957bbfddfd9aec4fdcadd97e5a2",
+        "right": "7b17e4b7e1c2333c496bd57581b4bea423c8f83c5ddc5342b97aed5f7e99aa74"
+      }
+    },
+    {
+      "path": "weapons/hbetterbows/mammothrecurvebow_black.nif",
+      "sha256": "8c50606849ea15a64ba7538d11845289a17e1f25a9bdc1e959e84545cb534299",
+      "provider": "LegacyoftheDragonborn.bsa",
+      "referenceOutputs": {
+        "left": "e7bd2aac46ff255a0c6faad554394df1bccecc39f06838846a821eb58c2bb808",
+        "right": "1f438d4e26ede63b79c0ad0ff23b7e1c4add76ca8827b808708c0f424aaa9368"
+      }
+    },
+    {
+      "path": "weapons/hbetterbows/mammothrecurvebow_blackdisp.nif",
+      "sha256": "f435af5c5da0a9a843a0a592b33c0a5a2c20f158a462ee4e75d61fb52a4e3bb0",
+      "provider": "LegacyoftheDragonborn.bsa",
+      "referenceOutputs": {
+        "left": "7e840d71db310f9900f3bd34085a21603a3cf724b89319e65ce2399973db1a94",
+        "right": "3cb362b5fa377fb86940506d1e14d6c5fbc1984a2f5dbcc6f59c3adfcbe8aaa4"
+      }
+    },
+    {
+      "path": "weapons/iron/1stpersonironbow.nif",
+      "sha256": "071a4c10e1e63409ef4951eaa57884e8aee8d7df92c3941616b10e618a741ffe",
+      "provider": "Cathedral - Armory",
+      "referenceOutputs": {
+        "left": "217eac150d857578ae83460e6adeb5dd67664c32dad251ea703cab25d2ac1b0e",
+        "right": "44eeaf6cc45f7801b0eb748dbbb703c2ba54b9aad5bcb67eb9eae44cad661d6f"
+      }
+    },
+    {
+      "path": "weapons/iron/ironbow.nif",
+      "sha256": "fb058fd55c7865f1678885acec3cd7d91a69755f39b5dea36eee7a7642d5fd87",
+      "provider": "Cathedral - Armory",
+      "referenceOutputs": {
+        "left": "912301026f91063e6992fd60238a581c316f59116a4eceabe69fecf21ff0e54a",
+        "right": "d73a38baae301667a0c367fa101f11648da54eefc301ae4647648bdfe5f318a3"
+      }
+    },
+    {
+      "path": "weapons/nightingale/nightingalebow.nif",
+      "sha256": "59be846cfd3ab162a44351f80d21b9b5a86141a7fab1791357c8346b1cebec4e",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "e2be8ed13def511c58afefc3589931afc8bd03dd2fea3394446446797b73f082",
+        "right": "891129330be0b3d2f6056915ca6ae361af82123a6d6a1a09c7139bd4bee1bea3"
+      }
+    },
+    {
+      "path": "weapons/nightingale/nightingalebowdisp.nif",
+      "sha256": "81bc61a73d6ada2900430f80287b51787797350ae27ea0090f59e3667c0d315a",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "bef0c71ae8f3ef9ff13831149a5f033052a082690259c375d2c7f28c95270cb4",
+        "right": "6cc9fae67c83a45c0272b1b89d65414920499ea7f11304aac5e638372f3497f9"
+      }
+    },
+    {
+      "path": "weapons/nordhero/nordherobow.nif",
+      "sha256": "7265b1fae7079531cf134638446ea47c3f4c8fe171d839b6970ea42aaab0e81a",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "27be9387d57ebc334fd5966dc79df2e14df9d2b9483062651fa6e472dcf70bf6",
+        "right": "3adce1b1c1ce2d66aa7386b52449b7140b61827e15cc52586d464c2b68d912b9"
+      }
+    },
+    {
+      "path": "weapons/orcish/1stpersonorcishbow.nif",
+      "sha256": "ae5d3826ae318ed483a8eda4f10b383999cf88e107c61b41188b1b9c8dc36119",
+      "provider": "Vanilla Weapon Replacer SSE",
+      "referenceOutputs": {
+        "left": "bba359ddbf1172ede29d52e99825bec818c84ea99fa4846b7f213f6a1dc1cbe1",
+        "right": "7be02e7a970fa7b9e4d5116ced8b21a0f003443f1ebadbd8803782f63df8695d"
+      }
+    },
+    {
+      "path": "weapons/orcish/orcishbow.nif",
+      "sha256": "5a2aad375b4d364dcc5cf9f18bf7747e59a98b797f9f7070af6555de8d1e4fcb",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "a62bf9e133dc7eab8c89e4f3a99323c1b3e5e923cb258514cd651706b297ed8d",
+        "right": "53d009fa0e84fb383a2fd70e04b52f6267d92f0248bafc5aed0f9f4947fa12dd"
+      }
+    },
+    {
+      "path": "weapons/steel/steelbow.nif",
+      "sha256": "1d3682f6e4e5f10fa6d4ed139f83f81886de70c928ca5ba0c519dd2f92ff1e83",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "3883d6b938e447fc7eddd30ea4f08aed4cd1341521a64b48003f387373ea3235",
+        "right": "5e9cd0b5bd7eea741eb32d7ca9df1c84b74b5b566178026f10eaf8f5e5ba32cf"
+      }
+    },
+    {
+      "path": "weapons/uniqueweaps/gauldurblackbow.nif",
+      "sha256": "c79979f9f2d46bdfdc75b8e879ca69c0675a5be688e48546a9bcdc2212588785",
+      "provider": "LegacyoftheDragonborn.bsa",
+      "referenceOutputs": {
+        "left": "184070ddb97672e66b60c2baed8995835ba99b54e5cc001b8899142e9d688fa2",
+        "right": "65519a34af0c91480be5761104aee248ba1c0e83f49c8709d5d838df8674bbe8"
+      }
+    },
+    {
+      "path": "weapons/uniqueweaps/gauldurblackbowdisp.nif",
+      "sha256": "cf16925c6fc74435809beea4928b4d21691a79e75bf7e1e81de37fbdfffe92aa",
+      "provider": "LegacyoftheDragonborn.bsa",
+      "referenceOutputs": {
+        "left": "8087839052266a63155b2b2ef27b8eca793b9c7ae3ce14aec687678f908f04c0",
+        "right": "5f9fe3bcae819c160733ffd3ec188c7136091c4275c0a2c8a48c70cfa818e5b3"
+      }
+    },
+    {
+      "path": "weapons/wooden/woodenbow.nif",
+      "sha256": "b402ea7e30f74657c5679e497dd5cdd248dd6bb05c0cbe3d3207a08234bdfa00",
+      "provider": "Output PGPatcher",
+      "referenceOutputs": {
+        "left": "925f8af8f275e59fffe36c0746e155d0c7c61f86ded2994c59760f690b096a84",
+        "right": "a828e36fca278eee1b0fd0fb8e64a4f31e3b014a6a3c4e2f05ac64b510b547cf"
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+[center][size=6][b]Bow Sight Windows VR[/b][/size]
+[size=4]Left- and right-handed bow sight windows[/size][/center]
+
+[b]Publication status[/b]
+The public GitHub release currently contains the original source and local build tools. The bundled mesh FOMOD is kept local while upstream asset redistribution permissions are reviewed. This description is prepared for a future permission-cleared mesh upload.
+
+[b]What it does[/b]
+Cuts a sight window above the existing arrow shelf so you can see more clearly along the arrow. The opening starts at the existing drawn-arrow height; grip and arrow placement stay unchanged.
+
+Version 0.3.0 gives the remaining bow section approximately 40% more width and makes the opening 15% shorter than 0.2.0, while retaining the shelf height.
+
+[b]Handedness[/b]
+[list]
+[*]Left-handed: hold the bow in your RIGHT hand and draw with your LEFT.
+[*]Right-handed: hold the bow in your LEFT hand and draw with your RIGHT.
+[/list]
+Select exactly one through the FOMOD installer. Reinstall and replace the mod to change hands.
+
+[b]Coverage[/b]
+Vanilla Skyrim, Dawnguard and Dragonborn bow families, Bound Bow, Drainspell Bow and unique-model variants used by the reference setup. Includes 34 mesh paths per hand, with relevant first-person and display variants. Crossbows and NPC-only dummy props are excluded.
+
+On ornate bows, the portion beside the notch is narrowed while the far side is retained. Bound Bow's flame/refraction surfaces also follow the opening.
+
+[b]Compatibility[/b]
+This reference build targets an existing MGO setup with Cathedral Armory, Vanilla Weapon Replacer SSE, PGPatcher output and some Legacy of the Dragonborn unique models. Keep the matching textures and materials. This is not a universal patch for every bow replacer.
+
+Mesh-only: no ESP, ESL or DLL. No changes to aim logic, damage, draw speed, ballistics, Bow Inertia VR settings, source skeletons, collision or animation references. Shared NPC/world models use the selected global handedness too.
+
+[b]Installation of a locally generated or future permission-cleared FOMOD[/b]
+[list=1]
+[*]Install with Mod Organizer 2 and choose the shooting hand.
+[*]Let the sight-window meshes win conflicts with the underlying bow mesh providers.
+[*]Disable the older Long Bow-only sight-window mod.
+[/list]
+Disable this mod to restore the underlying meshes. Regenerating PGPatcher output or installing a later mesh replacer may overwrite the cutouts.
+
+[b]Testing[/b]
+All 68 reference meshes pass offline geometry, bounds, weight-preservation and package-routing checks. The original left-handed Long Bow and 0.2.0 appearance received in-game approval. The revised 0.3.0 geometry was reviewed in a render; right-handed placement and all live effect combinations have not been exhaustively headset-tested.
+
+[b]Credits[/b]
+Bethesda Game Studios; the Cathedral Armory community and original contributors; Leadpipejustice, Mayor McCheese and the original Vanilla Weapon Replacer asset authors/SSE port contributors; Icecreamassassin and Legacy of the Dragonborn's contributing resource authors; PGPatcher and upstream asset contributors. See the repository's asset-permissions document for source links and the permission work required before a mesh upload.
+
+Original tools and documentation: Kevin (kperkins6). Their MIT license does not grant rights to third-party assets.
