@@ -2,6 +2,6 @@
 <fomod>
   <Name>Bow Sight Windows - Vanilla and DLC (MGO)</Name>
   <Author>Kevin</Author>
-  <Version>0.3.0</Version>
-  <Description>Handed sight-window mesh replacements for vanilla Skyrim and DLC bows. Wider remaining section, 15 percent shorter opening. No runtime plugin or aiming changes.</Description>
+  <Version>1.0.0</Version>
+  <Description>Bow sight windows for Skyrim VR. Choose left- or right-handed meshes for vanilla and DLC bows. No runtime plugin or aiming changes.</Description>
 </fomod>

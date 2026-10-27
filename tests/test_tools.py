@@ -2,7 +2,7 @@ from pathlib import Path
 import sys,json,struct,tempfile,unittest,contextlib,xml.etree.ElementTree as ET
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'tools'))
 from window import SHELF,TOP,TAPER,BEVEL,apply_window
-from build import revised_depth,build
+from build import cut_depth,build
 from nif_mesh import identity,assemble
 from nif_io import blocks,read_sse
 
@@ -14,18 +14,17 @@ def fixture_dir():
   yield folder
 
 class SourceChecks(unittest.TestCase):
- def test_opening_is_shorter_around_same_shelf(self):
+ def test_release_window_profile(self):
   self.assertAlmostEqual(SHELF,3.9707460691833494)
-  self.assertAlmostEqual((TOP-SHELF)/(20-SHELF),.85)
-  self.assertAlmostEqual((TAPER-SHELF)/(14-SHELF),.85)
-  self.assertAlmostEqual(BEVEL/.25,.85)
- def test_remaining_reference_width_increases_by_forty_percent(self):
+  self.assertAlmostEqual(TOP,17.595611910377503)
+  self.assertAlmostEqual(TAPER,12.495611910377502)
+  self.assertAlmostEqual(BEVEL,.2125)
+ def test_release_cut_depth(self):
   points=[[0,8,-2],[0,8,2]]
-  olddepth=1-.7/3.3;oldwidth=4-olddepth*3.3
   for hand in ('left','right'):
-   depth=revised_depth(points,hand,'weapons/example/bow.nif')
-   self.assertAlmostEqual((4-depth*3.3)/oldwidth,1.4)
-   self.assertGreater(depth,0);self.assertLess(depth,olddepth)
+   depth=cut_depth(points,hand,'weapons/example/bow.nif')
+   self.assertAlmostEqual(depth,.6181818181818182)
+   self.assertGreater(depth,0);self.assertLess(depth,1)
  def test_fomod_has_one_choice_and_both_routes(self):
   root=ET.parse(ROOT/'fomod/ModuleConfig.xml').getroot();group=root.find('.//group');self.assertEqual(group.attrib['type'],'SelectExactlyOne')
   choices=group.findall('./plugins/plugin');self.assertEqual(len(choices),2)

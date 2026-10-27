@@ -7,7 +7,7 @@
         <group name="Choose one handedness for all bows" type="SelectExactlyOne">
           <plugins order="Explicit">
             <plugin name="Left-handed - bow in RIGHT hand">
-              <description>Draw the string with your LEFT hand and hold the bow in your RIGHT hand. Installs left-handed sight windows for every included bow, with the wider remaining section and shorter opening requested for version 0.3.0. Includes Skyrim, Dawnguard and Dragonborn bows, unique variants and Bound Bow. Keep your existing texture/material mods. These meshes match the current MGO setup. Disable the earlier Long Bow-only sight-window mod, and let this package win mesh conflicts.</description>
+              <description>Draw the string with your LEFT hand and hold the bow in your RIGHT hand. Installs left-handed sight windows for every included bow. Includes Skyrim, Dawnguard and Dragonborn bows, unique variants and Bound Bow. Keep your existing texture/material mods. These meshes match the current MGO setup. Let this package win mesh conflicts.</description>
               <files>
                 <folder source="left\meshes" destination="meshes" priority="0" />
               </files>
@@ -16,7 +16,7 @@
               </typeDescriptor>
             </plugin>
             <plugin name="Right-handed - bow in LEFT hand">
-              <description>Draw the string with your RIGHT hand and hold the bow in your LEFT hand. Installs the opposite sight window on every included bow; bow models, skeletons and grips are not mirrored. Includes Skyrim, Dawnguard and Dragonborn bows, unique variants and Bound Bow. Keep your existing texture/material mods. These meshes match the current MGO setup. Disable the earlier Long Bow-only sight-window mod, and let this package win mesh conflicts.</description>
+              <description>Draw the string with your RIGHT hand and hold the bow in your LEFT hand. Installs the opposite sight window on every included bow; bow models, skeletons and grips are not mirrored. Includes Skyrim, Dawnguard and Dragonborn bows, unique variants and Bound Bow. Keep your existing texture/material mods. These meshes match the current MGO setup. Let this package win mesh conflicts.</description>
               <files>
                 <folder source="right\meshes" destination="meshes" priority="0" />
               </files>

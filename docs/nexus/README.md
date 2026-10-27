@@ -3,7 +3,7 @@
 ## Prepared fields
 
 - **Title:** Bow Sight Windows VR - Left and Right Handed
-- **Version:** 0.3.0
+- **Version:** 1.0.0
 - **Game:** Skyrim Special Edition, with VR targeting stated prominently
 - **Summary:** Physical bow sight windows with an arrow shelf and a narrower section above the grip. Choose left- or right-handed meshes through a FOMOD installer. No aiming, damage, ballistics or runtime plugin changes.
 - **Description:** [description.bbcode](description.bbcode)
@@ -16,9 +16,9 @@
 
 - [ ] Identify and clear redistribution terms for all third-party assets in the selected upload.
 - [ ] Add required original-author credits and permission evidence; select Nexus permission settings that actually match those grants.
-- [ ] Decide whether the public package targets the current MGO sources or a separately prepared stock-vanilla source set. Version 0.3.0 targets MGO sources.
+- [ ] Declare the supported source setup clearly. Release 1.0 targets the reference MGO sources.
 - [ ] Rebuild locally from the supported sources, run verification and test the ZIP through MO2's FOMOD UI.
-- [ ] Confirm the right-handed view, unique bows, Bound Bow flame/refraction effects and the revised 0.3.0 proportions in-game. Do not describe these as exhaustively tested yet.
+- [ ] Confirm the right-handed view, unique bows and Bound Bow flame/refraction effects in-game. Do not describe these as exhaustively tested yet.
 - [ ] Add in-game images showing several bow families; label the existing image as a neutral-shaded geometry render.
 - [ ] Declare actual texture/material/unique-model dependencies and conflicts; note that another mesh replacer or regenerated PGPatcher output can overwrite the cutouts.
 - [ ] Upload the verified FOMOD as the main file only after the permission and compatibility work above is complete.

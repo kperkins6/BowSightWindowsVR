@@ -2,10 +2,9 @@
 import math,struct
 from nif_mesh import norm,mv,trans,invtrans
 SHELF=3.9707460691833494
-HEIGHT_SCALE=.85
-TOP=SHELF+(20-SHELF)*HEIGHT_SCALE
-TAPER=SHELF+(14-SHELF)*HEIGHT_SCALE
-BEVEL=.25*HEIGHT_SCALE
+TOP=17.595611910377503
+TAPER=12.495611910377502
+BEVEL=.2125
 def apply_window(d,hand,depth=.76,influence_limit=.01):
  p=d['part'];mapping=d['mapping'];sign=1 if hand=='left' else -1;verts=p.vertices;roots=p.root_positions;cache={};changed=[];discarded=[]
  # String triangles are separate islands. Protect their complete islands rather
@@ -65,4 +64,4 @@ def apply_window(d,hand,depth=.76,influence_limit=.01):
   n=[n[0],n[1]-jy*n[2]/jz,n[2]/jz];t=[t[0],t[1],jy*t[1]+jz*t[2]];bit=[bit[0],bit[1],jy*bit[1]+jz*bit[2]]
   p.write_vertex(i,invtrans(mapping,new),mv(RT,n),mv(RT,t),mv(RT,bit))
  p.changed=bool(changed);p.preview_before=roots;p.preview_after=after
- return dict(originalVertices=p.original_count,vertices=len(verts),originalTriangles=len(p.original_triangles),triangles=len(p.triangles),changedVertices=len(changed),depth=depth,shelfY=SHELF,topY=TOP,taperY=TAPER,heightScale=HEIGHT_SCALE,protectedStringVertices=len(protected),newEdgesWithReducedBoneInfluences=len(discarded),maximumDiscardedInfluence=max(discarded,default=0))
+ return dict(originalVertices=p.original_count,vertices=len(verts),originalTriangles=len(p.original_triangles),triangles=len(p.triangles),changedVertices=len(changed),depth=depth,shelfY=SHELF,topY=TOP,taperY=TAPER,protectedStringVertices=len(protected),newEdgesWithReducedBoneInfluences=len(discarded),maximumDiscardedInfluence=max(discarded,default=0))

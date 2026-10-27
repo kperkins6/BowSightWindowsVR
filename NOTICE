@@ -1,0 +1,6 @@
+The MIT license applies to this project's original tools and documentation.
+Bethesda and upstream mod creators retain their asset rights. Their meshes,
+textures, materials, game data and derivatives are not licensed by this project.
+No NIF/BSA/DDS assets are included in the public repository or release toolkit.
+The comparison render illustrates the sight-window feature; the underlying
+asset rights remain with the original creators. See docs/ASSET_PERMISSIONS.md.

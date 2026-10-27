@@ -5,16 +5,14 @@ from nif_mesh import Mesh
 from window import apply_window,SHELF,TOP
 
 ROOT=Path(__file__).resolve().parents[1]
-def revised_depth(points,hand,path):
+def cut_depth(points,hand,path):
  sign=1 if hand=='left' else -1
  side=[sign*q[2] for q in points if q[0]>=-6 and 4.22<=q[1]<=14]
  maximum=max(side,default=1.5);minimum=min(side,default=-1.5)
- previous=.76 if path=='weapons/wooden/woodenbow.nif' else max(.76,min(.94,1-.7/(maximum+1.3)))
+ base_depth=.76 if path=='weapons/wooden/woodenbow.nif' else max(.76,min(.94,1-.7/(maximum+1.3)))
  coefficient=max(maximum+1.3,0)-max(minimum+1.3,0)
- old_width=maximum-minimum-previous*coefficient
- depth=max(0,previous-.4*old_width/coefficient) if coefficient>1e-9 else previous
- width=maximum-minimum-depth*coefficient
- if old_width>1e-9:assert abs(width/old_width-1.4)<1e-9
+ base_width=maximum-minimum-base_depth*coefficient
+ depth=max(0,base_depth-.4*base_width/coefficient) if coefficient>1e-9 else base_depth
  return depth
 
 def build(source_dir,output_dir):
@@ -33,23 +31,23 @@ def build(source_dir,output_dir):
   for hand in ('left','right'):
    mesh=Mesh(data);parts=[]
    for d in mesh.parts:
-    depth=revised_depth(d['part'].root_positions,hand,row['path'])
+    depth=cut_depth(d['part'].root_positions,hand,row['path'])
     effect='boundweapons' in row['path'] and mesh.objects[d['shape']].get('name') in ('FlamesMesh01:0','Refraction:0')
     parts.append(apply_window(d,hand,depth,influence_limit=.1 if effect else .01))
    result,changed=mesh.encode();digest=hashlib.sha256(result).hexdigest()
-   if digest!=row['referenceOutputs'][hand]:raise ValueError(f'Generated mesh differs from verified 0.3.0 reference: {hand}/{row["path"]}')
+   if digest!=row['referenceOutputs'][hand]:raise ValueError(f'Generated mesh differs from verified 1.0 reference: {hand}/{row["path"]}')
    target=package/hand/'meshes'/row['path'];target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(result)
    reports.append(dict(path=row['path'],hand=hand,sha256=digest,changedBlocks=changed,parts=parts))
  for name in ('ModuleConfig.xml','info.xml'):
   target=package/'fomod'/name;target.parent.mkdir(exist_ok=True);shutil.copyfile(ROOT/'fomod'/name,target)
  shutil.copyfile(ROOT/'docs/local-mod-installation.txt',package/'README.txt')
- archive=output_dir/'BowSightWindows-VanillaDLC-MGO-0.3.0-FOMOD.zip'
+ archive=output_dir/'BowSightWindows-VanillaDLC-MGO-1.0.0-FOMOD.zip'
  with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as z:
   for p in sorted(package.rglob('*')):
    if p.is_file():
     info=zipfile.ZipInfo(p.relative_to(package).as_posix(),(2026,10,26,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;z.writestr(info,p.read_bytes())
  with zipfile.ZipFile(archive) as z:assert z.testzip() is None and len(z.namelist())==71
- report=dict(version='0.3.0',meshes=len(reports),shelfY=SHELF,topY=TOP,windowHeightScale=.85,remainingReferenceWidthScale=1.4,archiveSHA256=hashlib.sha256(archive.read_bytes()).hexdigest(),outputs=reports)
+ report=dict(version='1.0.0',meshes=len(reports),shelfY=SHELF,topY=TOP,archiveSHA256=hashlib.sha256(archive.read_bytes()).hexdigest(),outputs=reports)
  (output_dir/'verification.json').write_text(json.dumps(report,indent=2)+'\n')
  return archive
 
