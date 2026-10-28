@@ -60,7 +60,7 @@ class Handler(BaseHTTPRequestHandler):
             with self.server.lock:
                 self.send(dict(job=self.server.job,project=self.server.project.summary() if self.server.project and self.server.job['state']!='running' else None,
                                defaults=self.server.defaults,settings=DEFAULTS))
-        elif route in ('/','/app.js','/viewer.js','/style.css','/mobile.css','/batch.css'):
+        elif route in ('/','/app.js','/viewer.js','/style.css','/mobile.css','/batch.css','/quick.css'):
             p=ROOT/'app'/('index.html' if route=='/' else route[1:])
             if not p.is_file(): self.send(dict(error='Application asset missing'),404);return
             data=p.read_bytes()
@@ -108,6 +108,13 @@ class Handler(BaseHTTPRequestHandler):
                 elif route=='/api/hand': project.set_hand(value['hand']);result=project.summary()
                 elif route=='/api/approve': project.approve(value['id']);result=project.row(value['id'])
                 elif route=='/api/save': result=project.document()
+                elif route=='/api/defaults-prepare':
+                    def work(progress):
+                        report=project.prepare_defaults(progress)
+                        return dict(action='defaults',report=report)
+                    self.server.task(work);result=dict(started=True)
+                elif route=='/api/defaults-approve':
+                    project.approve_defaults(value['id']);result=project.summary()
                 elif route=='/api/batch':
                     report=project.batch(value['ids'],value['action'],value.get('settings'))
                     result=dict(project=project.summary(),report=report)

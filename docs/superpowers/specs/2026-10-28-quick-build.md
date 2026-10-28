@@ -1,0 +1,9 @@
+# Primary default batch build
+
+The user approved a shortcut that builds every supported mesh using defaults, summarizes successes and failures, then approves successful results together while excluding failures. They explicitly requested that this be clearly demonstrated high in the page information architecture because most users will batch-build.
+
+The primary interface is a three-step panel before configuration and advanced controls: find bows, choose hand/build defaults, choose output folder/approve successful results and generate. Individual 3D review/manual batch tools remain available in a collapsed optional section. Failed/unsupported entries have counts, explanations and Inspect links. Warnings remain visible but do not require individual review.
+
+Default preparation preserves the current shooting hand, resets per-mesh custom openings to defaults, invalidates old approvals, and validates each supported mesh independently. It produces no output files and requires no browser geometry rendering. Successes are included pending explicit approval; failed/unsupported rows are excluded. Approval binds the run, source, settings, cached output and exact included supported set. A hand change or edited successful settings/selection invalidates it. Generation retains existing source/profile checks and transactional output behavior. Session summaries are ephemeral; normal project save/load still preserves per-bow settings/approvals.
+
+Verification covers mixed success/failure/unsupported runs, no-success behavior, source/settings/hand changes and manual inclusion of failures. Test the primary browser flow against the actual profile assets, including the known right-hand default failure, and verify only successful mesh paths appear in the output. Keep source assets and installed mods untouched. Continue publishing source-only packages in the existing repository after checks pass.

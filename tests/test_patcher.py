@@ -92,6 +92,19 @@ def project_fixture(folder):
     return Project(scan(dict(mode='data',data=str(data),plugins=str(plugins))))
 
 
+def mixed_project_fixture(folder):
+    from patcher_project import Project
+    from patcher_scan import scan
+    from nif_mesh import Mesh,assemble
+    base=project_fixture(folder);data=Path(folder)/'Data'
+    mesh=Mesh(synthetic_nif());d=mesh.parts[0];part=d['part']
+    for raw in part.raw:struct.pack_into('<f',raw,4,struct.unpack_from('<f',raw,4)[0]+100)
+    (data/'meshes/weapons/no-opening.nif').write_bytes(assemble(mesh.data,{d['partition']:part.encode()}))
+    (data/'meshes/weapons/unsupported.nif').write_bytes(b'Unsupported synthetic format')
+    plugin(data/'Skyrim.esm',[weapon(1,'GoodBow','weapons/bow.nif'),weapon(2,'NeedsAdjustment','weapons/no-opening.nif'),weapon(3,'Unsupported','weapons/unsupported.nif')])
+    return Project(scan(base.inventory['config']))
+
+
 class DiscoveryTests(unittest.TestCase):
     def test_discovery_is_available(self):
         import importlib.util
@@ -212,6 +225,54 @@ class AdjustableGeometryTests(unittest.TestCase):
 
 
 class ProjectTests(unittest.TestCase):
+    def test_defaults_build_separates_success_failures_and_unsupported(self):
+        from patcher_project import DEFAULTS
+        with fixture_dir() as t:
+            project=mixed_project_fixture(t)
+            good=next(r for r in project.rows if r['path']=='weapons/bow.nif')
+            project.update(good['id'],{'height':12},include=False);project.set_hand('right')
+            progress=[];result=project.prepare_defaults(progress.append)
+            self.assertEqual(project.hand,'right');self.assertEqual(good['settings'],DEFAULTS)
+            self.assertEqual(len(result['successes']),1);self.assertEqual(len(result['failures']),1);self.assertEqual(len(result['unsupported']),1)
+            self.assertTrue(good['include']);self.assertFalse(any(r['approved'] for r in project.rows))
+            self.assertTrue(all(not r['include'] for r in project.rows if r is not good));self.assertTrue(progress)
+            with self.assertRaisesRegex(ValueError,'review'):project.generate(Path(t)/'Unapproved')
+            project.approve_defaults(result['id'])
+            output=Path(t)/'Output';self.assertEqual(project.generate(output)['count'],1)
+            manifest=json.loads((output/'bow-sight-manifest.json').read_text())
+            self.assertEqual([r['path'] for r in manifest['meshes']],['weapons/bow.nif'])
+            self.assertEqual(len(manifest['skipped']),2)
+
+    def test_defaults_summary_cannot_approve_changed_geometry_or_wrong_run(self):
+        with fixture_dir() as t:
+            project=project_fixture(t);result=project.prepare_defaults()
+            with self.assertRaises(ValueError):project.approve_defaults('wrong-run')
+            key=project.rows[0]['id'];project.update(key,{'height':12})
+            self.assertFalse(project.summary()['defaultRun']['current'])
+            with self.assertRaisesRegex(ValueError,'changed'):project.approve_defaults(result['id'])
+            self.assertFalse(project.rows[0]['approved'])
+            result=project.prepare_defaults();project.set_hand('right')
+            with self.assertRaises(ValueError):project.approve_defaults(result['id'])
+
+    def test_defaults_summary_cannot_silently_include_failed_mesh(self):
+        with fixture_dir() as t:
+            project=mixed_project_fixture(t);result=project.prepare_defaults()
+            failed=result['failures'][0]['id'];project.update(failed,include=True)
+            self.assertFalse(project.summary()['defaultRun']['current'])
+            with self.assertRaisesRegex(ValueError,'changed'):project.approve_defaults(result['id'])
+            self.assertFalse(any(r['approved'] for r in project.rows))
+
+    def test_defaults_approval_rechecks_source_and_requires_success(self):
+        with fixture_dir() as t:
+            project=project_fixture(t);result=project.prepare_defaults()
+            (Path(t)/'Data/meshes/weapons/bow.nif').write_bytes(b'changed')
+            with self.assertRaisesRegex(ValueError,'changed'):project.approve_defaults(result['id'])
+            self.assertFalse(project.rows[0]['approved'])
+            result=project.prepare_defaults()
+            self.assertEqual(len(result['successes']),0)
+            self.assertEqual(len(result['failures']),1)
+            with self.assertRaisesRegex(ValueError,'successful'):project.approve_defaults(result['id'])
+
     def test_identical_profile_rewrite_does_not_invalidate_review(self):
         with fixture_dir() as t:
             project=project_fixture(t);key=project.rows[0]['id'];project.preview(key);project.approve(key)

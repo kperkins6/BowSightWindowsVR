@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.1-preview — 2026-10-28
+
+- Make the recommended three-step batch build the first workflow on the page.
+- Build and validate all supported meshes with defaults, then approve successful results together and generate output.
+- Exclude and list failed defaults/unsupported files without blocking successful results.
+- Move individual review and adjustment into an optional collapsed section.
+
 ## 1.1.0-preview — 2026-10-28
 
 - Read-only bow discovery from active MO2 profiles or deployed game Data, including mod-added bows and BSA assets.

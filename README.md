@@ -6,7 +6,15 @@ Create sight windows for bows from your own Skyrim SE/VR mod list: an arrow shel
 
 The new local patcher discovers the bows in your own mod list, previews actual before/after geometry, lets you adjust each opening, and generates a separate output mod. It supports left/right handedness, per-shape controls, saved projects, and **batch selection with preview cards and batch approval**. It does not require MGO or distribute anyone else's meshes.
 
-[Download the standalone patcher source package](https://github.com/kperkins6/BowSightWindowsVR/releases/tag/v1.1.0-preview), extract it, and run **Start Patcher.cmd** on Windows, or `python patcher.py` with Python 3.11+. No extra Python packages or internet connection are needed. Choose an MO2 profile or deployed game Data, scan, review/adjust, then generate a new folder and installer ZIP. Unsupported NIF layouts are listed explicitly. [Patcher guide and supported layouts](docs/PATCHER.md).
+[Download the standalone patcher source package](https://github.com/kperkins6/BowSightWindowsVR/releases/tag/v1.1.1-preview), extract it, and run **Start Patcher.cmd** on Windows, or `python patcher.py` with Python 3.11+. No extra Python packages or internet connection are needed.
+
+**Most users can use the three steps at the top of the page:**
+
+1. **Find bows** in an MO2 profile or deployed game Data.
+2. Choose your hand and **Build all supported with defaults**.
+3. Choose an output folder and **Approve successful & generate mod**.
+
+Failed defaults and unsupported meshes are listed separately and excluded automatically. No per-bow review is required. Individual 3D editing and manual batch controls remain available in an optional section. [Patcher guide and supported layouts](docs/PATCHER.md).
 
 The reference 1.0 FOMOD builder below remains available separately.
 

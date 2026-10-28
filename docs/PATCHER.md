@@ -6,6 +6,20 @@ The patcher reads the bows in your own Skyrim SE/VR mod list and generates a sep
 
 On Windows, double-click **Start Patcher.cmd**. Alternatively run `python patcher.py`. Keep the launcher running while editing. It opens a local page in your default browser; closing the launcher stops that page's backend.
 
+## Recommended: build everything with defaults
+
+The main workflow is at the top of the page. Individual review is optional.
+
+1. **Find your bows:** choose your mod list and click **Find bows**.
+2. **Build with defaults:** choose your shooting hand and click **Build all supported with defaults**. This replaces custom opening settings, builds and validates every supported mesh, and presents counts for successes, failed defaults and unsupported files. Nothing is approved or written to an output mod yet.
+3. **Approve & generate:** choose a new output folder, then click **Approve N successful & generate mod**. All successful results are approved together and exported. Failed and unsupported meshes are automatically excluded, so they do not block the rest.
+
+Open the summary's failure/warning lists if desired. **Inspect** opens the optional **Inspect or adjust individual bows** section, which contains the existing 3D editor and manual batch tools. If you manually change the successful selection or include a failed mesh, the quick summary becomes stale; rebuild defaults or finish through individual review. Changing hands requires a new default build.
+
+The automatic run is held in the current session. Saving a project preserves per-bow settings and approvals; after reopening an unapproved run, click **Build all supported with defaults** again to recreate its live validation summary.
+
+## Choose the input mod list
+
 To preselect a profile:
 
 ```powershell
@@ -19,7 +33,7 @@ python patcher.py --mo2 "D:/Modding/MO2/ModOrganizer.ini" --profile "My Profile"
 
 The scanner uses active plugins rather than looking for “bow” in every filename. Loose meshes win over BSAs. MO2 mod priority and overwrite are respected; BSA filenames are resolved through that priority, then loaded in INI/plugin order. Disabled mods are excluded. If a manager uses additional archive-redirection rules, use its deployed/virtual Data view or provide its actual INI. This is not a replacement for the game engine's entire virtual filesystem.
 
-## Preview and adjust
+## Optional: preview and adjust
 
 - Choose **Left-handed** for bow in right hand/string in left, or **Right-handed** for the reverse.
 - Select a mesh. Original and generated geometry use a synchronized camera. Drag to rotate, wheel to zoom, shift-drag to pan. Sight view, side view and three-quarter views make it easier to inspect protrusions. **Focus opening** frames the cutout; **Fit bow** restores the full view.

@@ -8,6 +8,7 @@ import shutil
 import struct
 import tempfile
 import zipfile
+import uuid
 
 from build import cut_depth
 from nif_io import blocks
@@ -16,7 +17,7 @@ from patcher_assets import MARKER, asset_path
 from patcher_scan import assets_for, scan, configuration, mo2_settings, profile_snapshot, MO2_RESOURCE_KEYS
 from window import apply_window, SHELF, TOP, TAPER, BEVEL
 
-VERSION='1.1.0-preview'
+VERSION='1.1.1-preview'
 DEFAULTS=dict(shelf=SHELF,height=TOP-SHELF,taper=TOP-TAPER,bevel=BEVEL,
               inner=-1.3,depth=None,protect_string=True,shapes=None)
 
@@ -131,7 +132,7 @@ class Project:
         if hand not in ('left','right'): raise ValueError('Invalid hand')
         self.inventory=copy.deepcopy(inventory);self.hand=hand
         self.assets=assets_for(inventory);self.rows=copy.deepcopy(inventory['bows'])
-        self.previews={}
+        self.previews={};self.default_run=None
         for row in self.rows:
             row.update(settings=copy.deepcopy(DEFAULTS),approved=False,include=True)
             row['supported']=False
@@ -157,7 +158,7 @@ class Project:
     def set_hand(self,hand):
         if hand not in ('left','right'): raise ValueError('Invalid hand')
         if hand!=self.hand:
-            self.hand=hand;self.previews.clear()
+            self.hand=hand;self.previews.clear();self.default_run=None
             for row in self.rows: row['approved']=False
 
     def update(self,key,options=None,include=None):
@@ -166,6 +167,7 @@ class Project:
             value=settings({**row['settings'],**options})
             if value!=row['settings']:
                 row['settings']=value;row['approved']=False;self.previews.pop(key,None)
+                row.pop('defaultError',None)
         if include is not None:
             if type(include) is not bool: raise ValueError('Invalid inclusion choice')
             row['include']=include
@@ -178,6 +180,7 @@ class Project:
         stamp=self.stamp(row);cached=self.previews.get(key)
         if cached and cached[0]==stamp: return cached[2]
         output,preview=patch(self.read(row),row['path'],self.hand,row['settings'])
+        row.pop('defaultError',None)
         self.previews[key]=(stamp,output,preview)
         return preview
 
@@ -186,6 +189,53 @@ class Project:
         if not cached or cached[0]!=self.stamp(row): raise ValueError('Generate a current preview before approving')
         self.read(row)
         row['approved']=True;row['include']=True
+
+    def prepare_defaults(self,progress=None):
+        """Build and validate defaults without approving or publishing anything."""
+        self.default_run=None;self.previews.clear()
+        report=dict(id=uuid.uuid4().hex,hand=self.hand,successes=[],failures=[],unsupported=[])
+        supported=[r for r in self.rows if r['supported']]
+        for row in self.rows:
+            row['approved']=False;row['include']=False;row.pop('defaultError',None)
+            if not row['supported']:
+                report['unsupported'].append(dict(id=row['id'],path=row['path'],error=row.get('error','Unsupported mesh')))
+        for i,row in enumerate(supported):
+            if progress:progress(f'Building defaults {i+1}/{len(supported)}: {row["path"]}')
+            self.update(row['id'],copy.deepcopy(DEFAULTS))
+            try:
+                preview=self.preview(row['id'])
+                row['include']=True
+                report['successes'].append(dict(id=row['id'],path=row['path'],stamp=self.stamp(row),
+                                                sha256=preview['sha256'],warnings=preview['warnings']))
+            except (ValueError,OSError,AssertionError,KeyError,IndexError,struct.error,RecursionError) as e:
+                row['defaultError']=str(e) or type(e).__name__
+                report['failures'].append(dict(id=row['id'],path=row['path'],error=row['defaultError']))
+        self.default_run=report
+        return self.default_status()
+
+    def default_status(self):
+        if self.default_run is None:return None
+        result=copy.deepcopy(self.default_run);result['current']=self.hand==result['hand']
+        successful={item['id'] for item in result['successes']}
+        if any(row['supported'] and row['include'] and row['id'] not in successful for row in self.rows):
+            result['current']=False
+        for item in result['successes']:
+            row=self.row(item['id']);cached=self.previews.get(item['id'])
+            if not row['include'] or self.stamp(row)!=item['stamp'] or not cached or cached[0]!=item['stamp'] or cached[2]['sha256']!=item['sha256']:
+                result['current']=False
+        result['approved']=sum(bool(self.row(item['id'])['approved']) for item in result['successes'])
+        return result
+
+    def approve_defaults(self,run_id):
+        report=self.default_status()
+        if report is None or report['id']!=run_id:raise ValueError('Build defaults again before approving this summary')
+        if not report['successes']:raise ValueError('No successful meshes to approve')
+        if not report['current']:raise ValueError('Settings or selection changed; build defaults again or use individual review')
+        # Validate every source before changing any approval state.
+        for item in report['successes']:self.read(self.row(item['id']))
+        for item in report['successes']:
+            row=self.row(item['id']);row['approved']=True;row['include']=True
+        return self.default_status()
 
     def batch(self,keys,action,options=None):
         if not isinstance(keys,list) or not keys or len(keys)>10000 or any(not isinstance(k,str) for k in keys):
@@ -214,7 +264,7 @@ class Project:
 
     def summary(self):
         return dict(hand=self.hand,rows=self.rows,warnings=self.inventory['warnings'],config=self.inventory['config'],
-                    weaponCount=self.inventory['weaponCount'],pluginCount=self.inventory['pluginCount'])
+                    weaponCount=self.inventory['weaponCount'],pluginCount=self.inventory['pluginCount'],defaultRun=self.default_status())
 
     def document(self):
         return dict(format='BowSightProject',version=1,config=self.inventory['config'],hand=self.hand,rows=copy.deepcopy(self.rows))
