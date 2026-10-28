@@ -1,18 +1,18 @@
 # Bow Sight Windows VR
 
-Sight windows for Skyrim VR bows, with an arrow shelf and a narrower section above the grip for a clearer view along the arrow. A FOMOD installer selects left- or right-handed meshes for the whole set.
+Create sight windows for bows from your own Skyrim SE/VR mod list: an arrow shelf and a narrower section above the grip for a clearer view along the arrow.
 
 ## Standalone patcher
 
 The new local patcher discovers the bows in your own mod list, previews actual before/after geometry, lets you adjust each opening, and generates a separate output mod. It supports left/right handedness, per-shape controls, saved projects, and **batch selection with preview cards and batch approval**. It does not require MGO or distribute anyone else's meshes.
 
-Run **Start Patcher.cmd** on Windows, or `python patcher.py` with Python 3.11+. Choose an MO2 profile or deployed game Data, scan, review/adjust, then generate a new folder and installer ZIP. Unsupported NIF layouts are listed explicitly. [Patcher guide and supported layouts](docs/PATCHER.md).
+[Download the standalone patcher source package](https://github.com/kperkins6/BowSightWindowsVR/releases/tag/v1.1.0-preview), extract it, and run **Start Patcher.cmd** on Windows, or `python patcher.py` with Python 3.11+. No extra Python packages or internet connection are needed. Choose an MO2 profile or deployed game Data, scan, review/adjust, then generate a new folder and installer ZIP. Unsupported NIF layouts are listed explicitly. [Patcher guide and supported layouts](docs/PATCHER.md).
 
 The reference 1.0 FOMOD builder below remains available separately.
 
 ![Bow without a sight window and bow with a sight window](docs/images/iron-bow-comparison.png)
 
-**Release 1.0. Public download: source and tools only.** The locally installed mesh mod is complete; the bundled mesh archive remains local while upstream redistribution permissions are reviewed. No game files or modified third-party NIFs are stored in this repository or attached to its releases.
+**Public downloads contain the patcher, source and documentation only.** Meshes are generated locally from your installed assets. No game files or modified third-party NIFs are stored in this repository or attached to its releases. The separate reference mesh archive remains local while upstream redistribution permissions are reviewed.
 
 ## What the mod changes
 

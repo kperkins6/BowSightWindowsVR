@@ -46,6 +46,8 @@ Enable **Batch selection** above the bow list. Check individual meshes, or use *
 
 Choose a **new output folder outside all source folders**, then click **Generate mod + ZIP**. Every included supported mesh must be approved. Unsupported meshes are listed but omitted. Generation rechecks active-plugin/profile snapshots, refreshes asset priorities and validates each source hash, then reproduces the reviewed bytes. It stages all meshes and validates the ZIP before publishing the new folder and archive. Existing outputs are never overwritten.
 
+Profile validation compares file contents and MO2 resource paths. Rewriting identical profile files or changing MO2 window/UI settings does not invalidate your reviews. Changing the active mod/plugin lists, archive INI contents, resource paths or source meshes requires a fresh scan.
+
 Install the resulting ZIP through your mod manager and let it win conflicts with its source bow meshes and later mesh-generating tools. Disable the earlier sight-window mod before enabling this output. The patcher does not install/enable the output or change your load order. A manifest marks generated mods so later MO2 scans can exclude them. In deployed mode, disable/remove previously deployed sight-window output before rescanning; it cannot reconstruct originals from overwritten files.
 
 ## Supported layouts and limitations

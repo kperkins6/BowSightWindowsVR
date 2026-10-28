@@ -1,11 +1,12 @@
 # Changelog
 
-## Unreleased — standalone patcher
+## 1.1.0-preview — 2026-10-28
 
 - Read-only bow discovery from active MO2 profiles or deployed game Data, including mod-added bows and BSA assets.
 - Left/right handedness, synchronized 3D previews, adjustable openings, per-shape controls and local saved projects.
 - Batch selection, filtered select-all, opening presets, preview cards, approval, inclusion and skipping.
 - Separate mesh-only folder/ZIP output, reviewed-byte validation and source-change detection.
+- Profile validation tolerates identical bookkeeping-file rewrites and MO2 UI saves while detecting actual profile/resource changes.
 
 ## 1.0 — 2026-10-26
 

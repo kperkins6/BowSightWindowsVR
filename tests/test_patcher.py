@@ -6,6 +6,7 @@ import sys
 import unittest
 import zlib
 import hashlib
+import os
 import http.client
 import threading
 
@@ -211,6 +212,48 @@ class AdjustableGeometryTests(unittest.TestCase):
 
 
 class ProjectTests(unittest.TestCase):
+    def test_identical_profile_rewrite_does_not_invalidate_review(self):
+        with fixture_dir() as t:
+            project=project_fixture(t);key=project.rows[0]['id'];project.preview(key);project.approve(key)
+            p=Path(t)/'plugins.txt';stamp=p.stat().st_mtime_ns
+            os.utime(p,ns=(stamp+10_000_000,stamp+10_000_000))
+            result=project.generate(Path(t)/'Output')
+            self.assertEqual(result['count'],1)
+
+    def test_mo2_ui_settings_do_not_invalidate_but_resource_paths_do(self):
+        from patcher_project import Project
+        from patcher_scan import scan
+        with fixture_dir() as t:
+            project_fixture(t)
+            root=Path(t);mo=root/'MO2';profile=mo/'profiles/Test';profile.mkdir(parents=True)
+            (mo/'mods').mkdir();(profile/'modlist.txt').write_text('# Empty mod list\n')
+            (profile/'plugins.txt').write_text('*Skyrim.esm\n');(profile/'loadorder.txt').write_text('Skyrim.esm\n')
+            ini=mo/'ModOrganizer.ini';content='[General]\ngamePath='+str(root)+'\nselected_profile=Test\n'
+            ini.write_text(content)
+            project=Project(scan(dict(mode='mo2',mo2=str(ini),profile='Test')))
+            key=project.rows[0]['id'];project.preview(key);project.approve(key)
+            ini.write_text(content+'[Geometry]\nwidth=1200\n')
+            self.assertEqual(project.generate(root/'Output')['count'],1)
+            other=mo/'OtherMods';other.mkdir()
+            ini.write_text(content+'[Settings]\nmod_directory='+str(other)+'\n')
+            with self.assertRaisesRegex(ValueError,'changed'):project.generate(root/'Output2')
+
+    def test_new_higher_priority_plugin_requires_rescan(self):
+        from patcher_project import Project
+        from patcher_scan import scan
+        with fixture_dir() as t:
+            project_fixture(t)
+            root=Path(t);mo=root/'MO2';profile=mo/'profiles/Test';profile.mkdir(parents=True)
+            high=mo/'mods/High';high.mkdir(parents=True)
+            (profile/'modlist.txt').write_text('+High\n')
+            (profile/'plugins.txt').write_text('*Skyrim.esm\n');(profile/'loadorder.txt').write_text('Skyrim.esm\n')
+            ini=mo/'ModOrganizer.ini';ini.write_text('[General]\ngamePath='+str(root)+'\nselected_profile=Test\n')
+            project=Project(scan(dict(mode='mo2',mo2=str(ini),profile='Test')))
+            key=project.rows[0]['id'];project.preview(key);project.approve(key)
+            plugin(high/'Skyrim.esm',[weapon(1,'RedirectedBow','weapons/other.nif')])
+            with self.assertRaisesRegex(ValueError,'changed'):project.generate(root/'Output')
+            self.assertFalse((root/'Output').exists())
+
     def test_custom_opening_cannot_push_geometry_outside_original_bounds(self):
         from patcher_project import patch,DEFAULTS
         with self.assertRaisesRegex(ValueError,'bound'):

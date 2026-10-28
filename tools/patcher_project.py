@@ -13,7 +13,7 @@ from build import cut_depth
 from nif_io import blocks
 from nif_mesh import Mesh, trans
 from patcher_assets import MARKER, asset_path
-from patcher_scan import assets_for, scan
+from patcher_scan import assets_for, scan, configuration, mo2_settings, profile_snapshot, MO2_RESOURCE_KEYS
 from window import apply_window, SHELF, TOP, TAPER, BEVEL
 
 VERSION='1.1.0-preview'
@@ -248,10 +248,23 @@ class Project:
         # Refresh file priorities, not only file bytes: a newly added higher
         # priority override must invalidate the earlier review too.
         self.assets=assets_for(self.inventory)
-        for path,snapshot in {**self.inventory.get('pluginSnapshots',{}),**self.inventory['config'].get('_selectionSnapshots',{})}.items():
+        for path,snapshot in self.inventory.get('pluginSnapshots',{}).items():
             p=Path(path)
             if not p.is_file() or [p.stat().st_size,p.stat().st_mtime_ns]!=snapshot:
                 raise ValueError('Active plugin changed since scan; rescan the mod list')
+        config=self.inventory['config']
+        for path,snapshot in config.get('_selectionSnapshots',{}).items():
+            p=Path(path)
+            if not p.is_file() or profile_snapshot(p)!=snapshot:
+                raise ValueError('Profile contents changed since scan; rescan the mod list')
+        if config.get('mode')=='mo2' and config.get('_mo2Resources'):
+            current=mo2_settings(config['mo2'])
+            if {key:current[key] for key in MO2_RESOURCE_KEYS}!=config['_mo2Resources']:
+                raise ValueError('MO2 resource paths changed since scan; rescan the mod list')
+        if self.inventory.get('pluginSnapshots'):
+            _,_,current_plugins,_,_=configuration(config)
+            if [str(p.resolve()) for p in current_plugins]!=list(self.inventory['pluginSnapshots']):
+                raise ValueError('Winning plugin sources changed since scan; rescan the mod list')
         generated=[]
         for row in selected:
             data=self.read(row)

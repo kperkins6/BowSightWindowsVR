@@ -7,6 +7,12 @@ from patcher_assets import AssetIndex, MARKER, asset_path, find_file
 from patcher_records import discover_bows
 
 STOCK=('skyrim.esm','update.esm','dawnguard.esm','hearthfires.esm','dragonborn.esm','skyrimvr.esm')
+MO2_RESOURCE_KEYS=('data','mods','profiles','overwrite','gameName')
+
+
+def profile_snapshot(path):
+    data=Path(path).read_bytes()
+    return dict(size=len(data),sha256=hashlib.sha256(data).hexdigest())
 
 
 def lines(path):
@@ -64,7 +70,10 @@ def configuration(config):
         if overwrite.is_dir(): roots.append(overwrite)
         plugin_file=profile/'plugins.txt';order_file=profile/'loadorder.txt'
         config.update(mo,profile=profile_name,data=str(data),mode=mode)
-        selection_paths.extend([Path(mo['mo2']),profile/'modlist.txt'])
+        selection_paths.append(profile/'modlist.txt')
+        # MO2 also writes window geometry and other UI state to this INI.
+        # Only resource-location settings affect this project's inputs.
+        config['_mo2Resources']={key:mo[key] for key in MO2_RESOURCE_KEYS}
         ini_candidates=[profile/n for n in ('skyrim.ini','skyrimvr.ini','Skyrim.ini','SkyrimVR.ini')]
         if not any(p.is_file() for p in ini_candidates):
             documents=Path.home()/'Documents'
@@ -99,7 +108,7 @@ def configuration(config):
     if missing: raise FileNotFoundError('Enabled plugins missing: '+', '.join(sorted(missing)))
     if config.get('ini'): ini_candidates=[Path(config['ini'])]
     selection_paths.extend([plugin_file,order_file]+[p for p in ini_candidates if p.is_file()])
-    config['_selectionSnapshots']={str(p.resolve()):[p.stat().st_size,p.stat().st_mtime_ns] for p in set(selection_paths) if p.is_file()}
+    config['_selectionSnapshots']={str(p.resolve()):profile_snapshot(p) for p in set(selection_paths) if p.is_file()}
     archives=[]
     ini_used=set()
     for ini in ini_candidates:
