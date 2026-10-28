@@ -5,7 +5,9 @@ SHELF=3.9707460691833494
 TOP=17.595611910377503
 TAPER=12.495611910377502
 BEVEL=.2125
-def apply_window(d,hand,depth=.76,influence_limit=.01):
+def apply_window(d,hand,depth=.76,influence_limit=.01,profile=None):
+ profile=profile or {};shelf=profile.get('shelf',SHELF);top=shelf+profile.get('height',TOP-SHELF);taper=top-profile.get('taper',TOP-TAPER);bevel=profile.get('bevel',BEVEL);inner=profile.get('inner',-1.3)
+ if hand not in ('left','right') or not all(math.isfinite(v) for v in (shelf,top,taper,bevel,inner,depth,influence_limit)) or not 0<=depth<.99 or not shelf<shelf+bevel<taper<top or not 0<=influence_limit<=.1:raise ValueError('Invalid window profile or depth')
  p=d['part'];mapping=d['mapping'];sign=1 if hand=='left' else -1;verts=p.vertices;roots=p.root_positions;cache={};changed=[];discarded=[]
  # String triangles are separate islands. Protect their complete islands rather
  # than using an X cutoff, which can stretch ornate bow decorations into spikes.
@@ -19,7 +21,7 @@ def apply_window(d,hand,depth=.76,influence_limit=.01):
  for i in range(len(verts)):islands.setdefault(find(i),[]).append(i)
  protected=set()
  for ids in islands.values():
-  if all(roots[i][0]<-9 and abs(roots[i][2]+.0198)<.25 for i in ids):protected.update(ids)
+  if profile.get('protect_string',True) and all(roots[i][0]<-9 and abs(roots[i][2]+.0198)<.25 for i in ids):protected.update(ids)
  def edge(a,b,y):
   key=(min(a,b),max(a,b),y)
   if key in cache:return cache[key]
@@ -39,7 +41,7 @@ def apply_window(d,hand,depth=.76,influence_limit=.01):
    if ina:out.append(a)
    if ina!=inb and abs(ya-y)>1e-7 and abs(yb-y)>1e-7:out.append(edge(a,b,y))
   return out
- for y in (SHELF,SHELF+BEVEL,TAPER,TOP):
+ for y in (shelf,shelf+bevel,taper,top):
   result=[]
   for t in p.triangles:
    ps=[roots[i] for i in t]
@@ -51,17 +53,17 @@ def apply_window(d,hand,depth=.76,influence_limit=.01):
  R=mapping[0];RT=[R[j*3+i] for i in range(3) for j in range(3)];after=[]
  for i,v in enumerate(verts):
   x,y,z=roots[i];f=df=0
-  if SHELF<y<TOP and i not in protected and sign*z>-1.3:
-   if y<SHELF+BEVEL:f=(y-SHELF)/BEVEL;df=1/BEVEL
-   elif y<=TAPER:f=1
-   else:f=(TOP-y)/(TOP-TAPER);df=-1/(TOP-TAPER)
-  new=[x,y,z-sign*depth*f*(sign*z+1.3)];after.append(new)
+  if shelf<y<top and i not in protected and sign*z>inner:
+   if y<shelf+bevel:f=(y-shelf)/bevel;df=1/bevel
+   elif y<=taper:f=1
+   else:f=(top-y)/(top-taper);df=-1/(top-taper)
+  new=[x,y,z-sign*depth*f*(sign*z-inner)];after.append(new)
   moved=math.dist(new,roots[i])>1e-7
   if moved:changed.append(i)
   if i<p.original_count and not moved:continue
-  jy=-sign*depth*df*(sign*z+1.3);jz=1-depth*f
+  jy=-sign*depth*df*(sign*z-inner);jz=1-depth*f
   n=mv(R,v['n']);t=mv(R,v['t']);bit=mv(R,v['bit'])
   n=[n[0],n[1]-jy*n[2]/jz,n[2]/jz];t=[t[0],t[1],jy*t[1]+jz*t[2]];bit=[bit[0],bit[1],jy*bit[1]+jz*bit[2]]
   p.write_vertex(i,invtrans(mapping,new),mv(RT,n),mv(RT,t),mv(RT,bit))
  p.changed=bool(changed);p.preview_before=roots;p.preview_after=after
- return dict(originalVertices=p.original_count,vertices=len(verts),originalTriangles=len(p.original_triangles),triangles=len(p.triangles),changedVertices=len(changed),depth=depth,shelfY=SHELF,topY=TOP,taperY=TAPER,protectedStringVertices=len(protected),newEdgesWithReducedBoneInfluences=len(discarded),maximumDiscardedInfluence=max(discarded,default=0))
+ return dict(originalVertices=p.original_count,vertices=len(verts),originalTriangles=len(p.original_triangles),triangles=len(p.triangles),changedVertices=len(changed),depth=depth,shelfY=shelf,topY=top,taperY=taper,protectedStringVertices=len(protected),newEdgesWithReducedBoneInfluences=len(discarded),maximumDiscardedInfluence=max(discarded,default=0))

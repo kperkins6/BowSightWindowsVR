@@ -58,6 +58,7 @@ class Mesh:
   def world(i):
    if i in cache:return cache[i]
    o=self.objects[i];local=(o.get('rotation',identity()[0]),o.get('translation',[0,0,0]),o.get('scale',1));cache[i]=compose(world(parents[i]),local) if i in parents else local;return cache[i]
+  self.world=world
   self.mid=next((o for o in self.objects if o.get('name')=='Bow_MidBone'),None)
   for shape in self.objects:
    if 'TriShape' not in shape['type'] or shape.get('skin',-1)<0:continue

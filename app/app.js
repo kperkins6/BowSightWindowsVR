@@ -1,0 +1,102 @@
+'use strict';
+const $=id=>document.getElementById(id),token=document.querySelector('meta[name=bow-token]').content;
+let project=null,selected=null,viewer=null,defaults=null,loading=false,dirty=false,pending=Promise.resolve(),timer=null,previewOkay=false,edits=null,queued=0,previewBusy=false,previewVersion=0;
+const batchSelection=new Set(),batchPreviews=new Map();
+try{viewer=new BowViewer($('before'),$('after'));}catch(e){$('viewer-empty').textContent=e.message;}
+const controlSpec=[['shelf','Shelf position',-30,50,.05],['height','Opening height',1,40,.05],['taper','Upper taper height',.1,15,.05],['bevel','Shelf bevel',.01,3,.01],['depth','Cut depth',.05,.98,.01],['inner','Inner boundary',-20,20,.05]];
+function status(message,error=false,running=false){$('status').textContent=message;$('status').className=error?'error':running?'running':'';}
+async function api(route,value){const response=await fetch('/api/'+route,{method:value===undefined?'GET':'POST',headers:{'X-Bow-Token':token,'Content-Type':'application/json'},body:value===undefined?undefined:JSON.stringify(value)});let data;try{data=await response.json();}catch{throw Error('The patcher is unavailable. Keep its launcher window open.');}if(!response.ok)throw Error(data.error||'Request failed');return data;}
+function row(){return project?.rows.find(r=>r.id===selected);}
+function state(r){return !r.supported?'blocked':!r.include?'skipped':r.approved?'approved':'review';}
+function fingerprint(r){return JSON.stringify([project.hand,r.sha256,r.settings]);}
+function filteredRows(){const needle=$('search').value.toLowerCase(),filter=$('filter').value;return (project?.rows||[]).filter(r=>(filter==='all'||state(r)===filter)&&(!needle||JSON.stringify([r.path,r.weapons]).toLowerCase().includes(needle)));}
+function name(r){const score=w=>(/mag_|ench|replica|dummy/i.test(w.editor)?1000:0)+w.editor.length;return [...r.weapons].filter(w=>w.editor).sort((a,b)=>score(a)-score(b))[0]?.editor||r.path.split('/').pop();}
+function notifyError(e){status(e.message||String(e),true);}
+function enqueue(fn){queued++;dirty=true;buttons();pending=pending.catch(()=>{}).then(fn).catch(notifyError).finally(()=>{queued--;dirty=queued>0||!!edits;buttons();});return pending;}
+function buttons(){const r=row(),busy=loading||dirty||previewBusy;for(const id of ['scan','load','save','hand','reset','skip','approve','generate'])$(id).disabled=busy;
+  $('save').disabled=busy||!project;$('skip-unreviewed').disabled=busy||!project;$('hand').disabled=busy||!project;$('reset').disabled=busy||!r?.supported;$('skip').disabled=busy||!r;
+  $('approve').disabled=busy||!r?.supported||!previewOkay||!viewer;
+  $('generate').disabled=busy||!project||!project.rows.some(r=>r.supported&&r.include&&r.approved)||project.rows.some(r=>r.supported&&r.include&&!r.approved);
+  const chosen=(project?.rows||[]).filter(r=>batchSelection.has(r.id)),eligible=chosen.filter(r=>r.supported);
+  for(const id of ['select-filtered','clear-selection','batch-include','batch-skip','batch-settings','batch-preview','batch-approve'])$(id).disabled=busy||!project;
+  for(const id of ['batch-include','batch-skip'])$(id).disabled=busy||!chosen.length;
+  $('batch-settings').disabled=busy||!eligible.length||!r?.supported;$('batch-preview').disabled=busy||!eligible.length||!viewer;
+  $('batch-approve').disabled=busy||!eligible.length||!eligible.every(r=>batchPreviews.get(r.id)?.stamp===fingerprint(r));
+  $('batch-count').textContent=`${chosen.length} selected · ${eligible.length} editable`;
+  $('batch-mode').disabled=busy;document.querySelectorAll('.bow-entry>input').forEach(input=>input.disabled=busy);
+  const editBusy=loading||queued>0||previewBusy;for(const [key] of controlSpec){const disabled=editBusy||!r?.supported||(key==='depth'&&r.settings.depth===null);$(key+'-number').disabled=disabled;$(key+'-range').disabled=disabled;}
+  for(const id of ['auto-depth','protect-string'])$(id).disabled=editBusy||!r?.supported;
+  $('shapes').querySelectorAll('input').forEach(input=>input.disabled=editBusy||!r?.supported);
+}
+function lists(){if(!project)return;const list=$('bow-list');list.replaceChildren();
+  for(const r of filteredRows()){const s=state(r);
+    const button=document.createElement('button');button.className='bow-row'+(r.id===selected?' selected':'');button.disabled=loading;
+    const title=document.createElement('span');title.className='name';title.textContent=name(r);const meta=document.createElement('span');meta.className='meta';
+    const role=document.createElement('span');role.textContent=r.roles.join(' · ');const tag=document.createElement('span');tag.className='tag '+s;tag.textContent={approved:'Reviewed',blocked:'Unsupported',skipped:'Skipped',review:'Review'}[s];meta.append(role,tag);button.append(title,meta);button.onclick=()=>select(r.id);
+    const wrap=document.createElement('div');wrap.className='bow-entry';if($('batch-mode').checked){const check=document.createElement('input');check.type='checkbox';check.checked=batchSelection.has(r.id);check.disabled=loading||dirty;check.setAttribute('aria-label','Select '+name(r)+' '+r.path);check.onchange=()=>{if(check.checked)batchSelection.add(r.id);else batchSelection.delete(r.id);buttons();};wrap.append(check);}wrap.append(button);list.append(wrap);}
+  if(!list.children.length){const p=document.createElement('p');p.className='empty';p.textContent='No meshes match this filter.';list.append(p);}
+  const approved=project.rows.filter(r=>state(r)==='approved').length,remaining=project.rows.filter(r=>state(r)==='review').length,blocked=project.rows.filter(r=>!r.supported).length,skipped=project.rows.filter(r=>state(r)==='skipped').length;
+  $('counts').textContent=project.rows.length+' meshes';$('output-summary').textContent=`${approved} reviewed · ${remaining} need review · ${skipped} skipped · ${blocked} unsupported`;
+  $('scan-summary').textContent=`${project.weaponCount} weapon records · ${project.rows.length} meshes · ${project.pluginCount} plugins`;
+  buttons();
+}
+function warnings(messages,target){$(target).replaceChildren();for(const message of messages){const p=document.createElement(target==='scan-warnings'?'li':'div');if(target!=='scan-warnings')p.className='notice';p.textContent=message;$(target).append(p);}}
+function showSettings(r){const options=r.settings;for(const [key] of controlSpec){const val=options[key]??.65;$(key+'-number').value=Number(val.toFixed(6));$(key+'-range').value=val;$(key+'-number').disabled=!r.supported||(key==='depth'&&options.depth===null);$(key+'-range').disabled=$(key+'-number').disabled;}
+  $('auto-depth').checked=options.depth===null;$('protect-string').checked=options.protect_string;$('auto-depth').disabled=!r.supported;$('protect-string').disabled=!r.supported;
+  $('shapes').replaceChildren();for(const shape of r.shapeNames||[]){const label=document.createElement('label');label.className='shape';const check=document.createElement('input');check.type='checkbox';check.checked=options.shapes===null||options.shapes.includes(shape.id);check.dataset.shape=shape.id;
+    check.onchange=()=>{const shapes=[...$('shapes').querySelectorAll('input:checked')].map(c=>Number(c.dataset.shape));if(!shapes.length){check.checked=true;status('Keep at least one editable shape selected, or skip this bow.',true);return;}change({shapes});};
+    const text=document.createElement('span');text.textContent=shape.name||'Shape '+shape.id;label.append(check,text);$('shapes').append(label);}
+}
+async function preview(id,reset=false){const r=project.rows.find(r=>r.id===id);if(!r?.supported)return;const version=++previewVersion;previewBusy=true;previewOkay=false;buttons();
+  status('Generating preview: '+name(r),false,true);
+  try{const data=await api('preview',{id});if(selected!==id)return;
+    if(viewer){viewer.set(data,r.settings,reset);$('viewer-empty').hidden=true;previewOkay=true;}
+    warnings(data.warnings,'model-warnings');$('model-info').textContent=`${r.weapons.length} weapon record(s) · ${data.shapes.length} shapes · ${data.changedVertices.toLocaleString()} adjusted vertices. Source: ${r.source}`;
+    status('Preview ready. Inspect the opening, then approve or adjust.');
+  }catch(e){if(selected===id){previewOkay=false;$('viewer-empty').hidden=false;$('viewer-empty').textContent=e.message;warnings([e.message],'model-warnings');notifyError(e);}}finally{if(version===previewVersion)previewBusy=false;buttons();}}
+async function select(id){if(loading)return;await flushEdits();await pending;selected=id;const r=row();previewOkay=false;lists();$('bow-title').textContent=name(r);$('bow-path').textContent=r.path;showSettings(r);$('review-status').textContent={approved:'Reviewed ✓',review:'Needs your review',blocked:'Unsupported mesh',skipped:'Skipped'}[state(r)];$('skip').textContent=r.include?'Skip bow':'Include bow';
+  $('viewer-empty').hidden=false;$('viewer-empty').textContent=r.error||'Preparing preview…';warnings(r.error?[r.error]:[],'model-warnings');$('model-info').textContent=r.source||'';
+  if(r.supported)await preview(id,true);buttons();}
+function flushEdits(){clearTimeout(timer);if(!edits)return pending;const {id,options}=edits;edits=null;return enqueue(async()=>{const updated=await api('settings',{id,settings:options});Object.assign(project.rows.find(r=>r.id===id),updated);batchPreviews.delete(id);renderCards();lists();if(selected===id){showSettings(row());$('review-status').textContent='Needs your review';await preview(id);}});}
+function change(options){if(!row())return;const id=selected;edits={id,options:{...(edits?.id===id?edits.options:{}),...options}};dirty=true;previewOkay=false;buttons();clearTimeout(timer);timer=setTimeout(flushEdits,250);}
+for(const [key,label,min,max,step] of controlSpec){const div=document.createElement('div');div.className='control';const top=document.createElement('div');top.className='control-title';const title=document.createElement('label');title.htmlFor=key+'-number';title.textContent=label;const number=document.createElement('input');number.type='number';number.id=key+'-number';number.step=step;number.disabled=true;number.setAttribute('aria-label',label);
+  const range=document.createElement('input');range.type='range';range.id=key+'-range';range.min=min;range.max=max;range.step=step;range.disabled=true;range.setAttribute('aria-label',label+' slider');
+  number.oninput=()=>{const val=Number(number.value);range.value=val;change({[key]:val});};range.oninput=()=>{number.value=range.value;change({[key]:Number(range.value)});};top.append(title,number);div.append(top,range);$('controls').append(div);}
+$('auto-depth').onchange=()=>change({depth:$('auto-depth').checked?null:Number($('depth-number').value)});
+$('protect-string').onchange=()=>change({protect_string:$('protect-string').checked});
+function config(){const value={mode:$('mode').value};for(const key of ['mo2','profile','data','plugins','loadorder','ini'])if($(key).value.trim())value[key]=$(key).value.trim();return value;}
+function mode(){document.querySelectorAll('.mo2-field').forEach(el=>el.hidden=$('mode').value!=='mo2');document.querySelectorAll('.data-field').forEach(el=>el.hidden=$('mode').value!=='data');}
+$('mode').onchange=mode;
+async function detect(){try{const result=await api('mo2',{path:$('mo2').value});$('profile').value=result.profile;$('data').value=result.data;$('profiles').replaceChildren();for(const name of result.profilesAvailable){const o=document.createElement('option');o.value=name;$('profiles').append(o);}status('MO2 paths detected. Choose a profile, then find bows.');}catch(e){notifyError(e);}}
+$('profiles-button').onclick=detect;
+for(const button of document.querySelectorAll('[data-pick]'))button.onclick=async()=>{try{const result=await api('pick',{kind:button.dataset.kind});if(result.path){$(button.dataset.pick).value=result.path;if(button.dataset.pick==='mo2')await detect();}}catch(e){notifyError(e);}};
+$('output-browse').onclick=async()=>{try{const result=await api('pick',{kind:'directory'});if(result.path)$('output').value=result.path.replace(/[\\/]$/,'')+'/Bow Sight Patcher Output';}catch(e){notifyError(e);}};
+async function waitJob(){loading=true;buttons();for(;;){await new Promise(r=>setTimeout(r,800));const data=await api('status');status(data.job.message,data.job.state==='error',data.job.state==='running');if(data.job.state==='running')continue;loading=false;
+    if(['scan','load'].includes(data.job.result?.action)){batchSelection.clear();batchPreviews.clear();$('batch-cards').replaceChildren();$('search').value='';selected=null;}
+    if(data.job.state==='error'){buttons();throw Error(data.job.message);}project=data.project;if(project){$('hand').value=project.hand;lists();warnings(project.warnings,'scan-warnings');$('warning-count').textContent=`(${project.warnings.length})`;$('setup').open=false;}
+    if(data.job.result?.action==='generate'){const r=data.job.result;status(`Generated ${r.count} ${r.hand}-handed meshes. Output: ${r.path} · Installer: ${r.zip}`);}buttons();return data;}}
+$('scan').onclick=async()=>{if(project&&!confirm('Start a fresh scan? Save the project first if you want to retain your adjustments.'))return;try{await api('scan',config());selected=null;await waitJob();const first=project.rows.find(r=>r.supported)||project.rows[0];if(first)await select(first.id);}catch(e){loading=false;notifyError(e);buttons();}};
+$('hand').onchange=()=>enqueue(async()=>{project=await api('hand',{hand:$('hand').value});batchPreviews.clear();$('batch-cards').replaceChildren();lists();if(selected){$('review-status').textContent='Needs your review';await preview(selected);}});
+$('reset').onclick=()=>change(defaults);
+$('skip').onclick=()=>enqueue(async()=>{const r=row(),updated=await api('settings',{id:r.id,include:!r.include});Object.assign(r,updated);lists();$('skip').textContent=r.include?'Skip bow':'Include bow';$('review-status').textContent=r.include?'Needs your review':'Skipped';});
+$('approve').onclick=async()=>{const id=selected;await enqueue(async()=>{const updated=await api('approve',{id});Object.assign(project.rows.find(r=>r.id===id),updated);lists();$('review-status').textContent='Reviewed ✓';status('Bow approved.');});const next=project.rows.find(r=>r.id!==id&&state(r)==='review');if(next)await select(next.id);};
+$('save').onclick=async()=>{try{await pending;const doc=await api('save',{});const blob=new Blob([JSON.stringify(doc,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='BowSightProject.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);status('Project saved. It includes your source paths and review settings; keep it local.');}catch(e){notifyError(e);}};
+$('load').onclick=()=>$('project-file').click();$('project-file').onchange=async()=>{const file=$('project-file').files[0];if(!file)return;try{const doc=JSON.parse(await file.text());await api('load',doc);selected=null;await waitJob();const first=project.rows.find(r=>r.supported)||project.rows[0];if(first)await select(first.id);}catch(e){loading=false;notifyError(e);buttons();}$('project-file').value='';};
+$('generate').onclick=async()=>{try{await pending;await api('generate',{output:$('output').value,zip:true});await waitJob();}catch(e){loading=false;notifyError(e);buttons();}};
+$('skip-unreviewed').onclick=()=>enqueue(async()=>{project=await api('skip-unreviewed',{});lists();if(row()){$('skip').textContent=row().include?'Skip bow':'Include bow';$('review-status').textContent=row().approved?'Reviewed ✓':'Skipped';}status('Unreviewed bows skipped. Reviewed bows remain selected for output.');});
+$('batch-mode').onchange=()=>{$('batch-panel').hidden=!$('batch-mode').checked;lists();buttons();};
+$('select-filtered').onclick=()=>{for(const r of filteredRows())batchSelection.add(r.id);lists();};
+$('clear-selection').onclick=()=>{batchSelection.clear();lists();};
+async function batchAction(action,settings){const result=await api('batch',{ids:[...batchSelection],action,settings});project=result.project;if(action==='settings'){for(const id of batchSelection)batchPreviews.delete(id);renderCards();previewOkay=false;}lists();status(`${result.report.affected} bows updated${result.report.unsupported?' · '+result.report.unsupported+' unsupported left unchanged':''}.`);if(row()){showSettings(row());$('review-status').textContent=row().approved?'Reviewed ✓':row().include?'Needs your review':'Skipped';$('skip').textContent=row().include?'Skip bow':'Include bow';}if(action==='settings'&&row()?.supported)await preview(selected);}
+$('batch-settings').onclick=()=>enqueue(()=>batchAction('settings',row().settings));
+$('batch-approve').onclick=()=>enqueue(()=>batchAction('approve'));
+$('batch-include').onclick=()=>enqueue(()=>batchAction('include'));
+$('batch-skip').onclick=()=>enqueue(()=>batchAction('skip'));
+function thumbnail(data,options){const c=document.createElement('canvas');c.width=480;c.height=230;const ctx=c.getContext('2d');ctx.fillStyle='#101a20';ctx.fillRect(0,0,480,230);const scale=190/(options.height*1.6),center=options.shelf+options.height/2;
+  for(let side=0;side<2;side++){ctx.save();ctx.beginPath();ctx.rect(side*240,0,240,230);ctx.clip();const faces=[];for(const shape of data.shapes){const p=shape[side?'after':'before'];for(const t of shape[side?'triangles':'beforeTriangles']){const q=t.map(i=>p[i]);if(q.some(v=>!v))continue;faces.push(q);}}faces.sort((a,b)=>a.reduce((s,q)=>s+q[0],0)-b.reduce((s,q)=>s+q[0],0));for(const q of faces){ctx.beginPath();q.forEach((p,i)=>{const x=side*240+120+p[2]*scale,y=125-(p[1]-center)*scale;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.closePath();ctx.fillStyle=side?'#c4b9a1':'#99aab5';ctx.fill();ctx.strokeStyle=ctx.fillStyle;ctx.lineWidth=.25;ctx.stroke();}ctx.fillStyle=side?'#e9b579':'#97a6ae';ctx.font='11px Segoe UI';ctx.fillText(side?'SIGHT WINDOW':'ORIGINAL',side*240+12,18);ctx.restore();}return c.toDataURL('image/png');}
+function renderCards(){$('batch-cards').replaceChildren();for(const r of project.rows){const p=batchPreviews.get(r.id);if(!p||p.stamp!==fingerprint(r))continue;const card=document.createElement('button');card.className='batch-card';const image=document.createElement('img');image.src=p.image;image.alt='Original and sight window opening for '+name(r);const title=document.createElement('span');title.textContent=name(r);const path=document.createElement('small');path.textContent=r.path;card.append(image,title,path);for(const warning of p.warnings||[]){const note=document.createElement('small');note.className='notice';note.textContent=warning;card.append(note);}card.onclick=()=>select(r.id);$('batch-cards').append(card);}}
+$('batch-preview').onclick=async()=>{await flushEdits();await pending;loading=true;buttons();const chosen=project.rows.filter(r=>batchSelection.has(r.id)&&r.supported);try{for(let i=0;i<chosen.length;i++){const r=chosen[i];status(`Batch preview ${i+1}/${chosen.length}: ${name(r)}`,false,true);try{const data=await api('preview',{id:r.id});batchPreviews.set(r.id,{stamp:fingerprint(r),image:thumbnail(data,r.settings),warnings:data.warnings});}catch(e){batchPreviews.delete(r.id);status(`${name(r)}: ${e.message}`,true);}renderCards();}status(`Batch previews ready: ${chosen.filter(r=>batchPreviews.has(r.id)).length}/${chosen.length}. Inspect the cards; click any bow for its 3D view.`);}catch(e){notifyError(e);}finally{loading=false;buttons();}};
+$('search').oninput=lists;$('filter').onchange=lists;
+$('front').onclick=()=>viewer?.angle(0,0);$('side').onclick=()=>viewer?.angle(Math.PI/2,0);$('angle').onclick=()=>viewer?.angle(.65,.15);$('focus').onclick=()=>viewer?.focus();$('fit').onclick=()=>viewer?.fit();$('wire').onchange=()=>{if(viewer){viewer.wire=$('wire').checked;viewer.render();}};$('guides').onchange=()=>{if(viewer){viewer.guides=$('guides').checked;viewer.render();}};
+window.addEventListener('beforeunload',e=>{if(project){e.preventDefault();e.returnValue='';}});
+api('status').then(async data=>{defaults=data.settings;for(const [k,v] of Object.entries(data.defaults))if($(k))$(k).value=v;mode();buttons();if(data.project){project=data.project;$('hand').value=project.hand;lists();warnings(project.warnings,'scan-warnings');$('warning-count').textContent=`(${project.warnings.length})`;$('setup').open=false;const first=project.rows.find(r=>r.supported)||project.rows[0];if(first)await select(first.id);}else status('Ready to scan.');}).catch(notifyError);

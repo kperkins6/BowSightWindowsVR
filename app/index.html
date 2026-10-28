@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="bow-token" content="__SESSION_TOKEN__"><title>Bow Sight Patcher</title><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/mobile.css"><link rel="stylesheet" href="/batch.css"></head>
+<body>
+<header><div class="brand"><span class="mark">◒</span><div><h1>Bow Sight Patcher</h1><p>A clear view, with the bows you already use.</p></div></div>
+<div class="header-actions"><button id="load">Open project</button><button id="save" disabled>Save project</button><input id="project-file" type="file" accept=".json" hidden></div></header>
+<details id="setup" open><summary>01 <strong>Mod list</strong><span id="scan-summary">Choose an MO2 profile or deployed game Data</span></summary>
+<div class="setup-grid"><label>Source<select id="mode"><option value="mo2">Mod Organizer 2 profile</option><option value="data">Deployed Data / Vortex / virtual Data</option></select></label>
+<label class="mo2-field wide">ModOrganizer.ini<div class="path"><input id="mo2" placeholder="Select your ModOrganizer.ini"><button data-pick="mo2" data-kind="file">Browse</button></div></label>
+<label class="mo2-field">Profile<div class="path"><input id="profile" placeholder="Currently selected profile" list="profiles"><datalist id="profiles"></datalist><button id="profiles-button">Detect</button></div></label>
+<label class="wide">Game Data folder <span class="optional">optional in MO2 mode</span><div class="path"><input id="data" placeholder="Auto-detected from MO2, or select game Data"><button data-pick="data" data-kind="directory">Browse</button></div></label>
+<label class="data-field wide" hidden>Active plugins.txt<div class="path"><input id="plugins" placeholder="Select active plugins.txt"><button data-pick="plugins" data-kind="file">Browse</button></div></label>
+<label class="data-field" hidden>Load order <span class="optional">optional</span><div class="path"><input id="loadorder" placeholder="loadorder.txt"><button data-pick="loadorder" data-kind="file">Browse</button></div></label>
+<label class="wide">Game INI <span class="optional">optional; use for custom archive loading</span><div class="path"><input id="ini" placeholder="Skyrim.ini or SkyrimVR.ini"><button data-pick="ini" data-kind="file">Browse</button></div></label>
+<div class="scan-actions"><button id="scan" class="primary">Find bows</button><span>Reads your sources. Creates a separate output mod.</span></div></div></details>
+<div id="status" role="status" aria-live="polite">Ready to scan.</div>
+<main>
+<aside class="library"><div class="section-title"><span>02</span><h2>Bows</h2><span id="counts">0 meshes</span></div>
+<input id="search" type="search" placeholder="Search bow, mesh or plugin…" aria-label="Search bows">
+<select id="filter" aria-label="Filter bows"><option value="all">All meshes</option><option value="review">Needs review</option><option value="approved">Reviewed</option><option value="skipped">Skipped</option><option value="blocked">Unsupported</option></select>
+<label class="check"><input type="checkbox" id="batch-mode"> Batch selection</label>
+<div id="bow-list"><p class="empty">Your bows will appear here after scanning.</p></div></aside>
+<section class="workbench"><div class="viewer-heading"><div><h2 id="bow-title">Find your sight line</h2><p id="bow-path">Select a bow to compare its original and patched geometry.</p></div><label class="hand">Shooting hand<select id="hand"><option value="left">Left-handed · bow in right hand</option><option value="right">Right-handed · bow in left hand</option></select></label></div>
+<div class="viewer-tools"><div><button id="front">Sight view</button><button id="side">Side view</button><button id="angle">Three-quarter</button></div><div><button id="focus">Focus opening</button><button id="fit">Fit bow</button><label><input type="checkbox" id="wire"> Wireframe</label><label><input type="checkbox" id="guides" checked> Guides</label></div></div>
+<div class="viewports"><div><span class="view-label">Original</span><canvas id="before" aria-label="Original bow 3D preview"></canvas></div><div><span class="view-label accent">Sight window</span><canvas id="after" aria-label="Patched bow 3D preview"></canvas></div><div id="viewer-empty">Scan your mod list, then select a bow.</div></div>
+<div class="viewer-caption"><span>Drag to rotate · wheel to zoom · shift-drag to pan</span><span>Actual mesh geometry · neutral shading</span></div>
+<div id="model-info"></div><div id="model-warnings"></div>
+<div class="review-bar"><span id="review-status">No bow selected</span><div><button id="skip" disabled>Skip bow</button><button id="approve" class="primary" disabled>Approve & next</button></div></div>
+<section id="batch-panel" hidden><h3>Batch selection <span id="batch-count">0 selected</span></h3><div class="batch-actions"><button id="select-filtered">Select all filtered</button><button id="clear-selection">Clear selection</button><button id="batch-settings" disabled>Apply current opening</button><button id="batch-preview" disabled>Preview selected</button><button id="batch-approve" disabled>Approve previewed</button><button id="batch-include" disabled>Include selected</button><button id="batch-skip" disabled>Skip selected</button></div><p class="hint">Opening settings apply to supported selections; shape choices remain individual. Preview cards focus on each opening. Click a card for the full 3D view.</p><div id="batch-cards"></div></section>
+</section>
+<aside class="adjustments"><div class="section-title"><span>03</span><h2>Opening</h2><button id="reset" disabled>Reset</button></div><p class="hint">Adjust the cutout to suit this mesh. The shelf marks where the arrow rests.</p>
+<div id="controls"></div><label class="check"><input id="auto-depth" type="checkbox" checked> Automatic depth</label><label class="check"><input id="protect-string" type="checkbox" checked> Protect bowstring</label>
+<h3>Shapes to edit</h3><div id="shapes"><p class="hint">Shape controls appear with your bow.</p></div><p class="hint">Leave a shape unchecked to retain it unchanged. Static parts are shown but cannot be edited.</p></aside>
+</main>
+<section class="output"><div><div class="section-title"><span>04</span><h2>Generate your mod</h2></div><p id="output-summary">Review each included bow, or skip it. Unsupported models are left out.</p></div>
+<label>New output folder<div class="path"><input id="output" placeholder="Choose a parent folder, then give the mod a new name"><button id="output-browse">Browse parent</button></div></label><div class="export-actions"><button id="skip-unreviewed" disabled>Skip unreviewed</button><button id="generate" class="primary" disabled>Generate mod + ZIP</button></div></section>
+<details class="scan-notes"><summary>Discovery notes <span id="warning-count"></span></summary><ul id="scan-warnings"></ul></details>
+<footer>Local processing · Your original meshes stay untouched · Skyrim SE / VR SSE meshes</footer>
+<script src="/viewer.js"></script><script src="/app.js"></script></body></html>

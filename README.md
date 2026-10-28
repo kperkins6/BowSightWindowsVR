@@ -2,6 +2,14 @@
 
 Sight windows for Skyrim VR bows, with an arrow shelf and a narrower section above the grip for a clearer view along the arrow. A FOMOD installer selects left- or right-handed meshes for the whole set.
 
+## Standalone patcher
+
+The new local patcher discovers the bows in your own mod list, previews actual before/after geometry, lets you adjust each opening, and generates a separate output mod. It supports left/right handedness, per-shape controls, saved projects, and **batch selection with preview cards and batch approval**. It does not require MGO or distribute anyone else's meshes.
+
+Run **Start Patcher.cmd** on Windows, or `python patcher.py` with Python 3.11+. Choose an MO2 profile or deployed game Data, scan, review/adjust, then generate a new folder and installer ZIP. Unsupported NIF layouts are listed explicitly. [Patcher guide and supported layouts](docs/PATCHER.md).
+
+The reference 1.0 FOMOD builder below remains available separately.
+
 ![Bow without a sight window and bow with a sight window](docs/images/iron-bow-comparison.png)
 
 **Release 1.0. Public download: source and tools only.** The locally installed mesh mod is complete; the bundled mesh archive remains local while upstream redistribution permissions are reviewed. No game files or modified third-party NIFs are stored in this repository or attached to its releases.
@@ -19,7 +27,7 @@ The mod installs meshes only. It keeps the source skeletons, grip and arrow plac
 
 This reference build was made against an existing **MGO setup**, using Cathedral Armory, Vanilla Weapon Replacer SSE, PGPatcher output and some Legacy of the Dragonborn unique models. It is not a standalone replacement for every possible vanilla/replacer installation. Keep the matching textures and materials. Crossbows and NPC-only dummy bows are excluded. The pictured `ironbow.nif` is the Imperial Bow model in the game records.
 
-The tool currently accepts the exact source hashes in [reference_sources.json](reference_sources.json), SSE NIF stream 100, one skin partition per shape, 40/44-byte vertex layouts and identity bone palettes. Unsupported inputs fail explicitly. It does not automatically adapt unrelated bow replacers.
+The reference FOMOD builder accepts the exact source hashes in [reference_sources.json](reference_sources.json). The standalone patcher accepts other sources within its [supported NIF layouts](docs/PATCHER.md#supported-layouts-and-limitations); unusual geometry needs visual adjustment and review.
 
 ## Build a local FOMOD
 
