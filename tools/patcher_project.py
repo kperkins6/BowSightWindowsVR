@@ -110,7 +110,7 @@ def patch(data, path, hand, options):
         if not all(math.isfinite(x) for x in bound) or bound[3]<0: raise ValueError('Invalid original shape bound')
         old_overshoot=max(math.dist(v['p'],bound[:3])-bound[3] for v in old.vertices[:old.original_count])
         new_overshoot=max(math.dist(v['p'],bound[:3])-bound[3] for v in p.vertices)
-        if new_overshoot>max(.002,old_overshoot+.002): raise ValueError('Opening exceeds original mesh bounds; reduce depth or inner boundary')
+        if new_overshoot>max(.002,old_overshoot+.002): raise ValueError('Opening exceeds original mesh bounds; adjust depth or inner boundary')
         old_degenerate=sum(area(old.root_positions,t)<1e-10 for t in old.original_triangles)
         if sum(area(positions,t)<1e-10 for t in p.triangles)>old_degenerate: raise ValueError('Cut creates degenerate triangles; adjust the opening')
         for v in p.vertices:

@@ -5,7 +5,7 @@ User authorized the standalone scanner, handedness selection, adjustable preview
 - Discovery: synthetic override/deletion/type, template/STAT, BSA104/105, compression toggle/embedded names, loose priority, MO2 reversed mod ordering and existing output exclusion tests passed.
 - Geometry/project: custom profiles, rig/layout blocking, preview-bound approval, save/load source revalidation, nested/existing output guards, stale source/asset priority/profile checks, opaque block preservation and batch review tests passed.
 - Local API: token/origin/host checks and deterministic concurrent-export mutation regression passed.
-- Actual local profile: 2,012 active plugins; 635 bow records; 75 unique paths; 68 editable meshes in both hands; seven dummy/legacy/unskinned layouts explicitly blocked. These figures are private local verification results, not universal compatibility claims.
+- Actual local profile: 2,012 active plugins; 635 bow records; 75 unique paths; 68 supported editable layouts; seven dummy/legacy/unskinned layouts explicitly blocked. Final bounds validation found one custom mesh needs a right-hand opening adjustment. These are local verification results, not universal compatibility claims.
 - All 34 reference output hashes match in both hands with default settings.
 - Isolated export generated 68 left-handed and 68 right-handed meshes plus validated ZIPs; every scanned original source hash remained unchanged. No installation, load-order change or public upload was performed.
 - Independent code review findings fixed: serialized preview topology, concurrent mutation during export, archive-name false filtering. Additional fixes cover unresolved references, refreshed asset priorities, output.zip collisions/rollback and stale profile snapshots.
