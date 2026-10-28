@@ -6,7 +6,15 @@ The patcher reads the bows in your own Skyrim SE/VR mod list and generates a sep
 
 On Windows, double-click **Start Patcher.cmd**. Alternatively run `python patcher.py`. Keep the launcher running while editing. It opens a local page in your default browser; closing the launcher stops that page's backend.
 
-## Recommended: build everything with defaults
+## Mad God's Overhaul: one-click build
+
+Choose your **Shooting hand**, then click **1-click MGO build** in the highlighted card at the top. It scans MGO's currently selected MO2 profile, builds and validates default openings, approves successful results and exports a new mod folder and ZIP. Failed defaults and unsupported meshes are excluded and listed. No manual scan, review or output-path setup is required.
+
+Use **Download MGO ZIP**, then install the archive in MO2 and let it win conflicts with its source meshes. The result also shows the generated folder and ZIP paths under the patcher's `build/generated` directory. Each run creates a unique output; the shortcut does not install or enable it. Save an existing editor project before starting a fresh MGO build if you want to keep your adjustments.
+
+Detection prefers an MGO installation supplied through `--mo2`. Otherwise it searches bounded MGO/Mad God folder patterns near fixed-drive roots and common user folders. It does not scan entire disks recursively. **Locate MGO** lets you select its ModOrganizer.ini if it is elsewhere or renamed. Multiple detected installations require a choice. The selected profile is read again when the build starts, and source-change checks still apply during export.
+
+## Other mod lists: build everything with defaults
 
 The main workflow is at the top of the page. Individual review is optional.
 

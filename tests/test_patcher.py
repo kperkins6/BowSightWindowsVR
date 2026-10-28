@@ -105,6 +105,65 @@ def mixed_project_fixture(folder):
     return Project(scan(base.inventory['config']))
 
 
+def mgo_fixture(folder,mixed=False):
+    (mixed_project_fixture if mixed else project_fixture)(folder)
+    root=Path(folder);mo=root/'MGO4.1';profile=mo/'profiles/enhanced';profile.mkdir(parents=True)
+    (mo/'mods').mkdir();(profile/'modlist.txt').write_text('# Base assets only\n')
+    (profile/'plugins.txt').write_text('*Skyrim.esm\n');(profile/'loadorder.txt').write_text('Skyrim.esm\n')
+    ini=mo/'ModOrganizer.ini';ini.write_text('[General]\ngamePath='+str(root)+'\nselected_profile=@ByteArray(enhanced)\ngameName=Skyrim VR\n')
+    return ini
+
+
+class MGOTests(unittest.TestCase):
+    def test_detects_configured_and_bounded_discovered_mgo(self):
+        from patcher_mgo import detect_mgo
+        with fixture_dir() as t:
+            ini=mgo_fixture(t)
+            found=detect_mgo(configured=ini,roots=[])
+            self.assertEqual(len(found),1);self.assertEqual(found[0]['profile'],'enhanced')
+            self.assertEqual(detect_mgo(roots=[Path(t)])[0]['ini'],str(ini.resolve()))
+
+    def test_generic_mo2_is_not_labelled_mgo(self):
+        from patcher_mgo import detect_mgo,validate_mgo
+        with fixture_dir() as t:
+            ini=mgo_fixture(t);generic=ini.parent.with_name('GenericMO2');ini.parent.rename(generic)
+            self.assertEqual(detect_mgo(configured=generic/'ModOrganizer.ini',roots=[Path(t)]),[])
+            with self.assertRaisesRegex(ValueError,'MGO'):validate_mgo(generic/'ModOrganizer.ini')
+
+    def test_one_click_builds_approves_exports_and_excludes_failures(self):
+        from patcher_mgo import build_mgo
+        with fixture_dir() as t:
+            ini=mgo_fixture(t,mixed=True);before=(Path(t)/'Data/meshes/weapons/bow.nif').read_bytes()
+            result,project=build_mgo(ini,'right',Path(t)/'outputs')
+            self.assertEqual(result['count'],1);self.assertEqual(result['hand'],'right')
+            self.assertEqual(len(result['report']['failures']),1);self.assertEqual(len(result['report']['unsupported']),1)
+            self.assertTrue(Path(result['zip']).is_file());self.assertTrue(Path(result['path']).is_dir())
+            self.assertTrue(next(r for r in project.rows if r['path']=='weapons/bow.nif')['approved'])
+            self.assertEqual((Path(t)/'Data/meshes/weapons/bow.nif').read_bytes(),before)
+            self.assertEqual((ini.parent/'profiles/enhanced/modlist.txt').read_text(),'# Base assets only\n')
+            second,_=build_mgo(ini,'left',Path(t)/'outputs')
+            self.assertNotEqual(result['path'],second['path'])
+
+    def test_missing_mgo_or_invalid_hand_creates_no_output(self):
+        from patcher_mgo import build_mgo
+        with fixture_dir() as t:
+            out=Path(t)/'outputs'
+            with self.assertRaises((ValueError,FileNotFoundError)):build_mgo(Path(t)/'missing.ini','left',out)
+            ini=mgo_fixture(t)
+            with self.assertRaises(ValueError):build_mgo(ini,'invalid',out)
+            self.assertFalse(out.exists())
+
+    def test_no_valid_meshes_reports_exclusions_without_output(self):
+        from patcher_mgo import build_mgo
+        with fixture_dir() as t:
+            ini=mgo_fixture(t)
+            (Path(t)/'Data/meshes/weapons/bow.nif').write_bytes(b'Unsupported synthetic format')
+            out=Path(t)/'outputs';result,project=build_mgo(ini,'left',out)
+            self.assertEqual(result['count'],0);self.assertIsNone(result['zip'])
+            self.assertEqual(len(result['report']['unsupported']),1)
+            self.assertFalse(out.exists());self.assertFalse(any(r['approved'] for r in project.rows))
+
+
 class DiscoveryTests(unittest.TestCase):
     def test_discovery_is_available(self):
         import importlib.util

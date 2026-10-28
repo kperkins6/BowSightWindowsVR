@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.2-preview — 2026-10-28
+
+- Add a prominent one-click Mad God's Overhaul workflow: detect the active profile, scan, build defaults, approve successful results and export a separate folder and ZIP.
+- Keep shooting-hand selection visible above both the MGO shortcut and generic batch workflow.
+- Add bounded installation discovery, an installation chooser and Locate MGO fallback, plus a direct ZIP download.
+- Report and exclude unsupported meshes and failed defaults; retain source/profile validation and protect existing editor work before replacing it.
+
 ## 1.1.1-preview — 2026-10-28
 
 - Make the recommended three-step batch build the first workflow on the page.

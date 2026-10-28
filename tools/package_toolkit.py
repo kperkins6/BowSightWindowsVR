@@ -4,7 +4,7 @@ import argparse,hashlib,json,re,subprocess,zipfile
 from audit_public import audit
 ROOT=Path(__file__).resolve().parents[1]
 if __name__=='__main__':
- parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--version',default='1.1.1-preview');args=parser.parse_args()
+ parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--version',default='1.1.2-preview');args=parser.parse_args()
  if not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.-]+)?',args.version):parser.error('Invalid package version')
  audit();files=[n for n in subprocess.check_output(['git','ls-files','-z'],cwd=ROOT).decode().split('\0') if n]
  out=ROOT/'dist';out.mkdir(exist_ok=True);archive=out/f'BowSightWindowsVR-{args.version}-SourceToolkit.zip'

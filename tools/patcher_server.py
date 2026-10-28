@@ -11,6 +11,7 @@ from urllib.parse import urlsplit
 
 from patcher_project import Project, DEFAULTS
 from patcher_scan import scan, mo2_settings
+from patcher_mgo import detect_mgo,validate_mgo,build_mgo
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -21,6 +22,7 @@ class LocalServer(ThreadingHTTPServer):
         super().__init__(('127.0.0.1',port),Handler)
         self.token=secrets.token_urlsafe(32);self.defaults=defaults or {}
         self.project=None;self.lock=threading.RLock();self.job=dict(state='idle',message='Choose your mod list to begin')
+        self.mgo_zip=None;self.mgo_output=ROOT/'build'/'generated'
 
     def task(self,fn):
         with self.lock:
@@ -60,6 +62,16 @@ class Handler(BaseHTTPRequestHandler):
             with self.server.lock:
                 self.send(dict(job=self.server.job,project=self.server.project.summary() if self.server.project and self.server.job['state']!='running' else None,
                                defaults=self.server.defaults,settings=DEFAULTS))
+        elif route=='/api/mgo-detect':
+            self.send(dict(installations=detect_mgo(self.server.defaults.get('mo2')),outputRoot=str(self.server.mgo_output)))
+        elif route=='/api/mgo-download':
+            path=self.server.mgo_zip
+            if not path or not path.is_file():self.send(dict(error='No completed MGO ZIP is available'),404);return
+            self.send_response(200);self.send_header('Content-Type','application/zip')
+            self.send_header('Content-Length',str(path.stat().st_size))
+            self.send_header('Content-Disposition','attachment; filename="'+path.name+'"');self.end_headers()
+            import shutil
+            with path.open('rb') as source:shutil.copyfileobj(source,self.wfile)
         elif route in ('/','/app.js','/viewer.js','/style.css','/mobile.css','/batch.css','/quick.css'):
             p=ROOT/'app'/('index.html' if route=='/' else route[1:])
             if not p.is_file(): self.send(dict(error='Application asset missing'),404);return
@@ -75,6 +87,24 @@ class Handler(BaseHTTPRequestHandler):
             if not 0<size<8*1024*1024: raise ValueError('Invalid request size')
             value=json.loads(self.rfile.read(size));route=urlsplit(self.path).path
             if not isinstance(value,dict): raise ValueError('Expected JSON object')
+            if route=='/api/mgo-locate':
+                self.send(dict(installations=[validate_mgo(value['ini'])]));return
+            if route=='/api/mgo-build':
+                ini=value.get('ini')
+                if ini:target=validate_mgo(ini)
+                else:
+                    targets=detect_mgo(self.server.defaults.get('mo2'))
+                    if len(targets)!=1:raise ValueError('Choose an MGO installation before starting the shortcut')
+                    target=targets[0]
+                hand=value.get('hand','left')
+                if hand not in ('left','right'):raise ValueError('Invalid shooting hand')
+                def work(progress):
+                    result,project=build_mgo(target['ini'],hand,self.server.mgo_output,progress)
+                    with self.server.lock:
+                        self.server.project=project
+                        self.server.mgo_zip=Path(result['zip']) if result['zip'] else None
+                    return result
+                self.server.task(work);self.send(dict(started=True));return
             if route=='/api/scan':
                 def work(progress):
                     inventory=scan(value,progress);progress('Checking bow geometry…')
