@@ -60,6 +60,14 @@ def check_rig(mesh):
         raise ValueError('Unsupported orientation/scale: bow must extend along model Y in the Skyrim bow rig')
 
 
+def arrow_reference(mesh,hand):
+    # Full-draw Long/Glass Bow telemetry: shaft crossing at local Mid Y=0.
+    # This is a rig-relative reference, not measured contact for custom meshes.
+    sign=1 if hand=='left' else -1
+    position=trans(mesh.world(mesh.mid['index']),[2.22276,0,sign*2.22019])
+    return dict(position=position,estimated=True,label='Estimated arrow position')
+
+
 def patch(data, path, hand, options):
     options=settings(options);mesh=Mesh(data);check_rig(mesh);shapes=[];reports=[];warnings=[]
     selected=options['shapes']
@@ -124,7 +132,7 @@ def patch(data, path, hand, options):
     original_blocks=blocks(data);new_blocks=blocks(output)
     for i,(kind,_,blob) in enumerate(original_blocks):
         if i not in changed and blob!=new_blocks[i][2]: raise ValueError('Unexpected change to opaque block '+kind)
-    return output,dict(shapes=shapes,reports=reports,warnings=warnings,changedVertices=count,sha256=digest(output))
+    return output,dict(shapes=shapes,reports=reports,warnings=warnings,changedVertices=count,sha256=digest(output),arrowReference=arrow_reference(mesh,hand))
 
 
 class Project:

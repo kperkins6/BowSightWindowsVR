@@ -265,6 +265,24 @@ class DiscoveryTests(unittest.TestCase):
 
 
 class AdjustableGeometryTests(unittest.TestCase):
+    def test_arrow_reference_uses_bow_mid_frame_and_mirrors_hand(self):
+        from patcher_project import arrow_reference
+        from types import SimpleNamespace
+        mesh=SimpleNamespace(mid={'index':7},world=lambda i:([0,1,0,-1,0,0,0,0,1],[1,6.373506,-.02],1))
+        left=arrow_reference(mesh,'left');right=arrow_reference(mesh,'right')
+        self.assertAlmostEqual(left['position'][0],1)
+        self.assertAlmostEqual(left['position'][1],4.150746)
+        self.assertAlmostEqual(left['position'][2],2.20019)
+        self.assertAlmostEqual(right['position'][2],-2.24019)
+        self.assertEqual(left['position'][:2],right['position'][:2])
+        self.assertTrue(left['estimated'])
+
+    def test_arrow_reference_stays_fixed_when_opening_moves(self):
+        from patcher_project import patch,DEFAULTS
+        _,first=patch(synthetic_nif(),'test.nif','left',DEFAULTS)
+        _,second=patch(synthetic_nif(),'test.nif','left',{**DEFAULTS,'shelf':DEFAULTS['shelf']+1})
+        self.assertEqual(first['arrowReference'],second['arrowReference'])
+
     def test_custom_profile_moves_opening_and_preserves_string(self):
         from window import apply_window
         from nif_mesh import identity

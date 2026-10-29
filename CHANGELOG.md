@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Show a cyan arrow-position reference in both 3D preview panels, with a separate toggle and a visible legend.
+- Transform the estimated reference through the bow's Mid bone frame, mirror it for handedness and keep it fixed while adjusting the opening. Custom-bow contact remains an estimate.
+
 ## 1.1.2-preview — 2026-10-28
 
 - Add a prominent one-click Mad God's Overhaul workflow: detect the active profile, scan, build defaults, approve successful results and export a separate folder and ZIP.

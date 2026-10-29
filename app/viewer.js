@@ -2,7 +2,7 @@
 // Dependency-free WebGL geometry viewer. Both panels share one camera.
 class BowViewer {
   constructor(before, after) {
-    this.canvases=[before,after];this.views=[];this.yaw=.25;this.pitch=.12;this.zoom=1;this.pan=[0,0];this.wire=false;this.guides=true;
+    this.canvases=[before,after];this.views=[];this.yaw=.25;this.pitch=.12;this.zoom=1;this.pan=[0,0];this.wire=false;this.guides=true;this.arrowReference=true;
     for (const canvas of this.canvases) {
       const gl=canvas.getContext('webgl',{antialias:true,alpha:false});
       if(!gl)throw new Error('WebGL is unavailable. Enable browser hardware acceleration to preview bows.');
@@ -11,7 +11,8 @@ class BowViewer {
       gl.attachShader(program,shader(gl.VERTEX_SHADER,`attribute vec3 p;attribute vec3 n;uniform mat4 m;varying vec3 normal;void main(){gl_Position=m*vec4(p,1.);normal=n;}`));
       gl.attachShader(program,shader(gl.FRAGMENT_SHADER,`precision mediump float;varying vec3 normal;uniform vec3 color;uniform float unlit;void main(){vec3 n=normalize(normal);float light=.28+.55*abs(dot(n,normalize(vec3(.5,.7,1.))))+.17*abs(n.y);gl_FragColor=vec4(color*mix(light,1.,unlit),1.);}`));
       gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(program));
-      this.views.push({gl,program,p:gl.getAttribLocation(program,'p'),n:gl.getAttribLocation(program,'n'),m:gl.getUniformLocation(program,'m'),color:gl.getUniformLocation(program,'color'),flat:gl.getUniformLocation(program,'unlit'),buffers:[]});
+      const marker=document.createElement('span');marker.className='arrow-marker';marker.hidden=true;marker.setAttribute('role','img');marker.setAttribute('aria-label','Estimated arrow position');marker.title='Estimated arrow position · rig reference, not measured contact';canvas.parentElement.append(marker);
+      this.views.push({gl,program,p:gl.getAttribLocation(program,'p'),n:gl.getAttribLocation(program,'n'),m:gl.getUniformLocation(program,'m'),color:gl.getUniformLocation(program,'color'),flat:gl.getUniformLocation(program,'unlit'),buffers:[],marker});
       let drag=null;
       canvas.addEventListener('pointerdown',e=>{drag=[e.clientX,e.clientY];canvas.setPointerCapture(e.pointerId);});
       canvas.addEventListener('pointerup',()=>drag=null);
@@ -48,7 +49,12 @@ class BowViewer {
   render(){if(!this.data||!this.center)return;for(const view of this.views){const {gl,program}=view,c=gl.canvas,dpr=Math.min(devicePixelRatio||1,2),w=Math.round(c.clientWidth*dpr),h=Math.round(c.clientHeight*dpr);if(!w||!h)continue;if(c.width!==w||c.height!==h){c.width=w;c.height=h;}gl.viewport(0,0,w,h);gl.clearColor(.062,.09,.113,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.useProgram(program);gl.uniformMatrix4fv(view.m,false,this.matrix(w/h));
       const draw=b=>{gl.bindBuffer(gl.ARRAY_BUFFER,b.pb);gl.enableVertexAttribArray(view.p);gl.vertexAttribPointer(view.p,3,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ARRAY_BUFFER,b.nb);gl.enableVertexAttribArray(view.n);gl.vertexAttribPointer(view.n,3,gl.FLOAT,false,0,0);gl.uniform3fv(view.color,b.color);gl.uniform1f(view.flat,b.line?1:0);gl.drawArrays(b.line?gl.LINES:gl.TRIANGLES,0,b.count);};
       gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(1,1);for(const b of view.buffers)if(!b.line)draw(b);gl.disable(gl.POLYGON_OFFSET_FILL);if(this.wire)for(const b of view.buffers)if(b.line)draw(b);
-      if(this.guides){const s=this.settings.shelf,t=s+this.settings.height;const p=[[-7,s,-7],[-7,s,7],[7,s,7],[7,s,-7],[-7,t,-7],[-7,t,7],[7,t,7],[7,t,-7]];const b=this.upload(view,p,[[0,1,2],[0,2,3],[4,5,6],[4,6,7]],[.61,.43,.25],true);gl.disable(gl.DEPTH_TEST);draw(b);gl.deleteBuffer(b.pb);gl.deleteBuffer(b.nb);}}
+      if(this.guides){const s=this.settings.shelf,t=s+this.settings.height;const p=[[-7,s,-7],[-7,s,7],[7,s,7],[7,s,-7],[-7,t,-7],[-7,t,7],[7,t,7],[7,t,-7]];const b=this.upload(view,p,[[0,1,2],[0,2,3],[4,5,6],[4,6,7]],[.61,.43,.25],true);gl.disable(gl.DEPTH_TEST);draw(b);gl.deleteBuffer(b.pb);gl.deleteBuffer(b.nb);}
+      const point=this.data.arrowReference?.position,m=this.matrix(w/h),marker=view.marker;
+      marker.hidden=true;
+      if(this.arrowReference&&point){const x=m[0]*point[0]+m[4]*point[1]+m[8]*point[2]+m[12],y=m[1]*point[0]+m[5]*point[1]+m[9]*point[2]+m[13];
+        if(Math.abs(x)<=1&&Math.abs(y)<=1){marker.style.left=((x+1)*50)+'%';marker.style.top=((1-y)*50)+'%';marker.hidden=false;}}
+    }
   }
 }
 window.BowViewer=BowViewer;

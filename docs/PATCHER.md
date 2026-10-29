@@ -44,6 +44,7 @@ The scanner uses active plugins rather than looking for “bow” in every filen
 ## Optional: preview and adjust
 
 - Choose **Left-handed** for bow in right hand/string in left, or **Right-handed** for the reverse.
+- **Arrow reference** shows a cyan point in both panels at the estimated arrow position. It follows the bow's Mid bone frame and chosen hand, and stays fixed when you change the opening. The reference is derived from full-draw Long/Glass Bow telemetry; it is not a measured contact point for every custom bow. It stays visible through the mesh and can be toggled separately from the shelf guides.
 - Select a mesh. Original and generated geometry use a synchronized camera. Drag to rotate, wheel to zoom, shift-drag to pan. Sight view, side view and three-quarter views make it easier to inspect protrusions. **Focus opening** frames the cutout; **Fit bow** restores the full view.
 - Adjust shelf position, opening height, upper taper, shelf bevel, depth and inner boundary. Values are in model units. Automatic depth follows the reference algorithm; manual depth is a fraction below 0.99. Raising depth makes a deeper opening. The inner boundary controls where lateral narrowing stops.
 - Select individual shapes to edit. For example, retain an unrelated effect layer or decoration. Static embedded parts remain visible and unchanged. Review every warning about unsupported or retained geometry.
