@@ -1,7 +1,9 @@
 # Changelog
 
-## Unreleased
+## 1.1.3-preview — 2026-10-29
 
+- Separate the current-bow editor from a four-step batch workflow, with explicit source/target scope, approval readiness and output controls.
+- Use consistent approve/exclude labels, select only supported filtered targets, and show batch cards only for selected bows. Clarify project-wide handedness and export scope.
 - Show a cyan arrow-position reference in both 3D preview panels, with a separate toggle and a visible legend.
 - Transform the estimated reference through the bow's Mid bone frame, mirror it for handedness and keep it fixed while adjusting the opening. Custom-bow contact remains an estimate.
 

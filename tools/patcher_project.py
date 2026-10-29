@@ -17,7 +17,7 @@ from patcher_assets import MARKER, asset_path
 from patcher_scan import assets_for, scan, configuration, mo2_settings, profile_snapshot, MO2_RESOURCE_KEYS
 from window import apply_window, SHELF, TOP, TAPER, BEVEL
 
-VERSION='1.1.2-preview'
+VERSION='1.1.3-preview'
 DEFAULTS=dict(shelf=SHELF,height=TOP-SHELF,taper=TOP-TAPER,bevel=BEVEL,
               inner=-1.3,depth=None,protect_string=True,shapes=None)
 

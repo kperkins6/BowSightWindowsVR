@@ -49,25 +49,28 @@ The scanner uses active plugins rather than looking for “bow” in every filen
 - Adjust shelf position, opening height, upper taper, shelf bevel, depth and inner boundary. Values are in model units. Automatic depth follows the reference algorithm; manual depth is a fraction below 0.99. Raising depth makes a deeper opening. The inner boundary controls where lateral narrowing stops.
 - Select individual shapes to edit. For example, retain an unrelated effect layer or decoration. Static embedded parts remain visible and unchanged. Review every warning about unsupported or retained geometry.
 - **Protect bowstring** preserves the standard string islands. For unconventional strings, inspect all views carefully; this protection recognizes the reference Skyrim geometry layout rather than every conceivable custom string.
-- **Approve & next** records the exact preview and advances to the next unreviewed mesh. **Skip bow** omits it. Any geometry setting or hand change invalidates the affected approval.
+- **Approve this bow & next** records the exact preview and advances to the next bow needing approval. **Exclude this bow** omits it. Any geometry setting or hand change invalidates the affected approval. Opening controls affect only the current bow; shooting hand applies to the whole project.
 
 The viewer shows the actual quantized output vertices and triangles, in a neutral material. It does not reproduce textures, game shaders, magical animation, a drawn animation pose, eye position or headset occlusion. Defaults match the finished reference sight window but are not an automatic measurement of a custom bow's arrow rest. Check unusual designs in game after installation.
 
 ## Batch mode
 
-Enable **Batch selection** above the bow list. Check individual meshes, or use **Select all filtered** after searching/filtering. Selection persists across filters; the counter includes hidden selections.
+Enable **Select bows for batch actions** above the bow list. Clicking a bow name chooses the current editor/source bow; checking a box chooses a batch target. Editing the current bow does not automatically change any checked targets.
 
-- **Apply current opening** copies the current mesh's opening parameters to the selected supported meshes. Shape IDs remain individual, since they differ between NIFs.
-- **Preview selected** generates each selected supported mesh and creates before/after cards focused on its opening. Click a card to inspect that bow in 3D. Unsupported selections are left unchanged.
-- **Approve previewed** approves the selected supported meshes only when all have successful, current previews. Changes to hand/settings require previews again. Batch approval is your decision after inspecting the cards and any unusual bows.
-- **Include selected** and **Skip selected** control which meshes will be generated. Skipping clears approval.
-- **Skip unreviewed** near the output controls is useful when generating a subset: reviewed meshes remain included and other meshes are omitted.
+The separate **Work on selected bows** section follows four steps:
+
+1. **Choose target bows:** check individual meshes or click **Select supported bows in this filter**. Unsupported meshes are not added by that button. Selection persists across filters and does not change output inclusion.
+2. **Copy an opening to the targets (optional):** the source bow and target count are shown beside **Copy this bow’s opening to N selected bows**. This replaces the targets' opening dimensions and string protection, preserves each bow's shape choices and clears affected approvals. Skip this step to keep individual openings.
+3. **Preview and approve the targets:** preview cards show only selected bows with current previews. Click a card for its 3D view. **Approve N selected previews for output** approves and includes the selected supported bows once every target has a current preview. Opening/hand changes require fresh previews. Optional inclusion/exclusion controls are grouped underneath; inclusion alone does not approve, while exclusion clears approval.
+4. **Generate the output mod:** choose a new output folder and click **Generate mod folder + ZIP**. This exports the whole project's included, approved bows, including bows outside the checked selection. The readiness count shows any included bows still needing approval or exclusion. These output-path controls share the same value as the main workflow above.
+
+**Exclude all unapproved bows** near the project output controls is useful when generating a subset: approved bows remain included and other bows are omitted. Install the generated ZIP through your mod manager to apply the mesh changes in game.
 
 ## Save and generate
 
 **Save project** downloads a local JSON containing source paths, hashes, per-bow parameters, inclusion and review state. **Open project** rescans its mod list and only restores approvals for matching sources. Projects contain installation paths: keep them local.
 
-Choose a **new output folder outside all source folders**, then click **Generate mod + ZIP**. Every included supported mesh must be approved. Unsupported meshes are listed but omitted. Generation rechecks active-plugin/profile snapshots, refreshes asset priorities and validates each source hash, then reproduces the reviewed bytes. It stages all meshes and validates the ZIP before publishing the new folder and archive. Existing outputs are never overwritten.
+Choose a **new output folder outside all source folders**, then click **Generate mod folder + ZIP**. Every included supported mesh must be approved. Unsupported meshes are listed but omitted. Generation rechecks active-plugin/profile snapshots, refreshes asset priorities and validates each source hash, then reproduces the approved bytes. It stages all meshes and validates the ZIP before publishing the new folder and archive. Existing outputs are never overwritten.
 
 Profile validation compares file contents and MO2 resource paths. Rewriting identical profile files or changing MO2 window/UI settings does not invalidate your reviews. Changing the active mod/plugin lists, archive INI contents, resource paths or source meshes requires a fresh scan.
 
